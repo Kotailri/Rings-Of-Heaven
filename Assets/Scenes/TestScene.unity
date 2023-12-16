@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 1205619690}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.991, z: 0}
+  m_LocalPosition: {x: 0, y: -0.499, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -213,14 +213,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66d26d8669db26e4a94d69c3df06e92d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runMaxSpeed: 0
-  runAcceleration: 0
-  runDecceleration: 0
-  runDeccelAmount: 0
-  runAccelAmount: 0
-  accelInAir: 0
-  deccelInAir: 0
-  doConserveMomentum: 0
+  runMaxSpeed: 9.5
+  runAccelAmount: 20
+  runDeccelAmount: 20
+  accelInAir: 1
+  deccelInAir: 1
+  gravityScale: 1.7333333
+  fallGravityMult: 2
+  maxFallSpeed: 18
+  fastFallGravityMult: 1
+  maxFastFallSpeed: 18
+  jumpForce: 26
+  jumpCutGravityMult: 3
+  jumpHangGravityMult: 1
+  jumpHangTimeThreshold: 0
+  coyoteTime: 0.2
+  jumpInputBufferTime: 0.2
   _groundCheckPoint: {fileID: 1205619691}
   _groundCheckSize: {x: 0.49, y: 0.03}
   _groundLayer:
@@ -267,8 +275,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: b281b91a70a624a0da1c43adc1c30c7b, type: 3}
+  m_Color: {r: 0.44499823, g: 0.754717, b: 0.6933479, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -287,15 +295,15 @@ Transform:
   m_GameObject: {fileID: 1524108154}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.39, y: -1.722, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.56, y: 1.23, z: 0}
+  m_LocalScale: {x: 1.5, y: 2, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1205619691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!70 &1524108159
-CapsuleCollider2D:
+--- !u!61 &1524108159
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -327,8 +335,63 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
-  m_Direction: 0
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.9860643}
+  m_EdgeRadius: 0
+--- !u!1 &1573503602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1573503604}
+  - component: {fileID: 1573503603}
+  m_Layer: 0
+  m_Name: Debug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1573503603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573503602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e7608927f58e1a459f1428a9cce5cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DoubleJump: 0
+--- !u!4 &1573503604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573503602}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.4176571, y: 1.0537647, z: -0.027643966}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1638569427
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,7 +583,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 9
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -689,3 +752,4 @@ SceneRoots:
   - {fileID: 1638569430}
   - {fileID: 2083834921}
   - {fileID: 1524108158}
+  - {fileID: 1573503604}

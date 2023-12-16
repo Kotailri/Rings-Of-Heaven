@@ -40,8 +40,9 @@ public class PlayerMovement : MonoBehaviour
 
     [Space(10)]
     [Header("Jump")]
-    [HideInInspector]
-    public bool isJumping;
+    private bool isJumping;
+    private bool canDoubleJump = false; // can we double jump
+    private bool isDoubleJumping = false; // did we in the middle of or falling from a double jump
     //public float jumpHeight; //Height of the player's jump
     //public float jumpTimeToApex; //Time between applying the jump force and reaching the desired jump height. These values also control the player's gravity and jump force.
     public float jumpForce; //The actual force applied (upwards) to the player when they jump.
@@ -120,6 +121,7 @@ public class PlayerMovement : MonoBehaviour
             if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
             {
                 lastOnGroundTime = coyoteTime;
+                isDoubleJumping = false;
             }
         }
 
@@ -146,17 +148,22 @@ public class PlayerMovement : MonoBehaviour
             Jump();
         }
 
-        // Gravity
-        //Higher gravity if we've released the jump input or are falling
-        /*
-        if (RB.velocity.y < 0 && PlayerControls.GetDown())
+        if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping && PlayerControls.GetJumpPressed())
         {
-            //Much higher gravity if holding down
-            RB.gravityScale = gravityScale * fastFallGravityMult;
-            //Caps maximum fall speed, so when falling over large distances we don't accelerate to insanely high speeds
-            RB.velocity = new Vector2(RB.velocity.x, Mathf.Max(RB.velocity.y, -maxFastFallSpeed));
+            isDoubleJumping = true;
+
+            _isJumpCut = false;
+            RB.velocity = new Vector2(RB.velocity.x, 0);
+            float fallSpeedBoost = Mathf.Abs(RB.velocity.y);
+            RB.AddForce(Vector2.up * (jumpForce + fallSpeedBoost), ForceMode2D.Impulse);
         }
-        */
+
+        if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
+        {
+            _isJumpCut = true;
+        }
+
+        // Gravity
         if (_isJumpCut)
         {
             //Higher gravity if jump button released
