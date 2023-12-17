@@ -4,89 +4,60 @@ using UnityEngine;
 
 public enum FacingDirection
 {
-    Right,
-    Left, 
-    Up, 
-    Down
+    Right, Left, Up, Down
 }
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Run")]
     public float runMaxSpeed; //Target speed we want the player to reach.
-    //public float runAcceleration; //The speed at which our player accelerates to max speed, can be set to runMaxSpeed for instant acceleration down to 0 for none at all
     public float runAccelAmount; //The actual force (multiplied with speedDiff) applied to the player.
-    //public float runDecceleration; //The speed at which our player decelerates from their current speed, can be set to runMaxSpeed for instant deceleration down to 0 for none at all
     public float runDeccelAmount; //Actual force (multiplied with speedDiff) applied to the player .
 
     [Space(10)]
-    [Range(0.01f, 1)] 
-    public float accelInAir; //Multipliers applied to acceleration rate when airborne.
-    [Range(0.01f, 1)] 
-    public float deccelInAir;
-
-    [Space(10)]
     [Header("Gravity")]
-    //public float gravityStrength; //Downwards force (gravity) needed for the desired jumpHeight and jumpTimeToApex.
     public float gravityScale; //Strength of the player's gravity as a multiplier of gravity (set in ProjectSettings/Physics2D).
-                                                 //Also the value the player's rigidbody2D.gravityScale is set to.
+
     [Space(5)]
     public float fallGravityMult; //Multiplier to the player's gravityScale when falling.
     public float maxFallSpeed; //Maximum fall speed (terminal velocity) of the player when falling.
-    [Space(5)]
-    public float fastFallGravityMult; //Larger multiplier to the player's gravityScale when they are falling and a downwards input is pressed.
-                                      //Seen in games such as Celeste, lets the player fall extra fast if they wish.
-    public float maxFastFallSpeed; //Maximum fall speed(terminal velocity) of the player when performing a faster fall.
 
     [Space(10)]
     [Header("Jump")]
     private bool isJumping;
-    private bool canDoubleJump = false; // can we double jump
-    private bool isDoubleJumping = false; // did we in the middle of or falling from a double jump
-    //public float jumpHeight; //Height of the player's jump
-    //public float jumpTimeToApex; //Time between applying the jump force and reaching the desired jump height. These values also control the player's gravity and jump force.
-    public float jumpForce; //The actual force applied (upwards) to the player when they jump.
+    private bool isDoubleJumping; // are we in the middle of or falling from a double jump
+    private bool _isJumpCut = false;
 
-    [Space(10)]
-    [Header("Both Jumps")]
+    public float jumpForce; //The actual force applied (upwards) to the player when they jump.
     public float jumpCutGravityMult; //Multiplier to increase gravity if the player releases thje jump button while still jumping
-    [Range(0f, 1)] 
-    public float jumpHangGravityMult; //Reduces gravity while close to the apex (desired max height) of the jump
-    public float jumpHangTimeThreshold; //Speeds (close to 0) where the player will experience extra "jump hang". The player's velocity.y is closest to 0 at the jump's apex (think of the gradient of a parabola or quadratic function)
-    //[Space(0.5f)]
-    //public float jumpHangAccelerationMult;
-    //public float jumpHangMaxSpeedMult;
 
     [Space(10)]
     [Header("Jump Assists")]
-    [Range(0.01f, 0.5f)] public float coyoteTime; //Grace period after falling off a platform, where you can still jump
-    [Range(0.01f, 0.5f)] public float jumpInputBufferTime; //Grace period after pressing jump where a jump will be automatically performed once the requirements (eg. being grounded) are met.
+    [Range(0.01f, 0.5f)] public float coyoteTime; //Grace period after falling off a platform, where you are still grounded
+    [Range(0.01f, 0.5f)] public float jumpInputBufferTime; //Grace period after pressing jump, where you have still pressed jump
 
-    private bool _isJumpCut;
-    private bool _isJumpFalling;
+    [Space(15)]
+    [Header("Checks")]
+    [SerializeField] private Transform _groundCheckPoint;
+    [SerializeField] private Vector2 _groundCheckSize = new(0.49f, 0.03f);
+    [SerializeField] private LayerMask _groundLayer;
+
+    private Rigidbody2D RB;
+    private FacingDirection facing = FacingDirection.Right;
+    private Vector2 moveInput;
 
     // Timers
     private float lastOnGroundTime;
     private float lastPressedJumpTime;
 
-    [Space(15)]
-    [Header("Checks")]
-    [SerializeField] 
-    private Transform _groundCheckPoint;
-    [SerializeField] 
-    private Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
-
-    [Space(10)]
-    private Rigidbody2D RB;
-    private FacingDirection facing = FacingDirection.Right;
-    
-    public LayerMask _groundLayer;
-
-    private Vector2 moveInput;
-
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
+    }
+
+    public Vector2 GetVelocity()
+    {
+        return RB.velocity;
     }
 
     private void Update()
@@ -95,16 +66,23 @@ public class PlayerMovement : MonoBehaviour
         lastOnGroundTime -= Time.deltaTime;
         lastPressedJumpTime -= Time.deltaTime;
 
+        // Get the x moveinput to:  0 for not moving, -1 for left, +1 for right 
         moveInput.x = Utility.BoolToInt(PlayerControls.GetRight()) - Utility.BoolToInt(PlayerControls.GetLeft());
 
+        // Change the facing direction when new movement direction is different from current
         if (moveInput.x != 0)
         {
             if (moveInput.x > 0)
             {
-                CheckDirectionToFace(facing);
+                CheckDirectionToFace(true);
+            }
+            else
+            {
+                CheckDirectionToFace(false);
             }
         }
 
+        #region Jump Inputs
         if (PlayerControls.GetJumpPressed()) 
         {
             OnJumpInput();
@@ -114,70 +92,73 @@ public class PlayerMovement : MonoBehaviour
         {
             OnJumpUpInput();
         }
+        #endregion
 
-        // Collision Checking
+        #region Jump Checks
         if (!isJumping)
         {
+            // If touching ground
             if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
             {
+                // Reset grounded time, with coyote time tolerance
                 lastOnGroundTime = coyoteTime;
                 isDoubleJumping = false;
             }
         }
 
-        // Jump Checks
+        // After jump, now falling = no longer jumping
         if (isJumping && RB.velocity.y < 0)
         {
             isJumping = false;
         }
 
+        // Falling, without jumping
         if (lastOnGroundTime > 0 && !isJumping)
         {
-            _isJumpCut = false;
-
-            if (!isJumping)
-                _isJumpFalling = false;
+            _isJumpCut = false; // not a jump cut
         }
 
-        // Jump
+        // If can jump and jump was pressed recently
         if (CanJump() && lastPressedJumpTime > 0)
         {
-            isJumping = true;
-            _isJumpCut = false;
-            _isJumpFalling = false;
-            Jump();
+            isJumping = true; // Is now jumping
+            _isJumpCut = false; // Reset jump cut when new jump
+            Jump(); // Do jump
         }
+        #endregion
 
+        #region Double Jump
+        // jump unlocked, not grounded, not currently double jumping, jump input
         if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping && PlayerControls.GetJumpPressed())
         {
-            isDoubleJumping = true;
+            isDoubleJumping = true; // Is now double jumping
 
-            _isJumpCut = false;
-            RB.velocity = new Vector2(RB.velocity.x, 0);
-            float fallSpeedBoost = Mathf.Abs(RB.velocity.y);
-            RB.AddForce(Vector2.up * (jumpForce + fallSpeedBoost), ForceMode2D.Impulse);
+            _isJumpCut = false; // Reset jump cut when new jump
+            RB.velocity = new Vector2(RB.velocity.x, 0); // Zero the fall speed
+
+            RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Apply Jump
         }
 
+        // jump cut if jump released while ascending from double jump
         if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
         {
             _isJumpCut = true;
         }
+        #endregion
 
-        // Gravity
+        #region Gravity
         if (_isJumpCut)
         {
-            //Higher gravity if jump button released
+            // When jump cut, gravity increases by jump cut grav mutliplier
             RB.gravityScale = gravityScale * jumpCutGravityMult;
             RB.velocity = new Vector2(RB.velocity.x, Mathf.Max(RB.velocity.y, -maxFallSpeed));
         }
-        else if ((isJumping || _isJumpFalling) && Mathf.Abs(RB.velocity.y) < jumpHangTimeThreshold)
-        {
-            RB.gravityScale = gravityScale * jumpHangGravityMult;
-        }
         else
         {
+            // Apply normal gravity
             RB.gravityScale = gravityScale;
         }
+        #endregion
     }
 
     private void FixedUpdate()
@@ -187,38 +168,41 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnJumpInput()
     {
+        // when jump is pressed
+        // set last pressed jump time to the tolerance
+        // during the tolerance time, a jump is always being "pressed"
         lastPressedJumpTime = jumpInputBufferTime;
     }
 
     public void OnJumpUpInput()
     {
+        // when jump is released, apply a jump cut
         if (CanJumpCut())
             _isJumpCut = true;
     }
 
     private void Jump()
     {
-        //Ensures we can't call Jump multiple times from one press
+        // Ensures we can't call Jump multiple times from one press, remove all tolerances
         lastPressedJumpTime = 0;
         lastOnGroundTime = 0;
 
-        //We increase the force applied if we are falling
-        //This means we'll always feel like we jump the same amount 
-        //(setting the player's Y velocity to 0 beforehand will likely work the same, but I find this more elegant :D)
-        float force = jumpForce;
-        if (RB.velocity.y < 0)
-            force -= RB.velocity.y;
+        // zero the fall speed
+        RB.velocity = new Vector2(RB.velocity.x, 0);
 
-        RB.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+        // Apply jump force
+        RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
     private bool CanJump()
     {
+        // Can jump if on ground recently (tolerance), and not currently jumping
         return lastOnGroundTime > 0 && !isJumping;
     }
 
     private bool CanJumpCut()
     {
+        // Can jump cut only when ascending 
         return isJumping && RB.velocity.y > 0;
     }
 
@@ -226,30 +210,19 @@ public class PlayerMovement : MonoBehaviour
     {
         //Calculate the direction we want to move in and our desired velocity
         float targetSpeed = moveInput.x * runMaxSpeed;
-        targetSpeed = Mathf.Lerp(RB.velocity.x, targetSpeed, 1);
-        float accelRate;
+        //targetSpeed = Mathf.Lerp(RB.velocity.x, targetSpeed, 0.5f * Time.deltaTime);
 
-        //Gets an acceleration value based on if we are accelerating (includes turning) 
-        //or trying to decelerate (stop). As well as applying a multiplier if we're air borne.
-        if (lastOnGroundTime > 0)
-        {
-            if (Mathf.Abs(targetSpeed) > 0.01f)
-                accelRate = runAccelAmount;
-            else
-                accelRate = runDeccelAmount;
-        }
+        // Apply acceleration/decceleration
+        float accelRate;
+        if (Mathf.Abs(targetSpeed) > 0.01)
+            accelRate = runAccelAmount;
         else
-        {
-            if (Mathf.Abs(targetSpeed) > 0.01f)
-                accelRate = runAccelAmount * accelInAir;
-            else
-                accelRate = runDeccelAmount * deccelInAir;
-        }
+            accelRate = runDeccelAmount;
 
         //Calculate difference between current velocity and desired velocity
         float speedDif = targetSpeed - RB.velocity.x;
-        //Calculate force along x-axis to apply to thr player
 
+        //Calculate force along x-axis to apply to thr player
         float movement = speedDif * accelRate;
 
         //Convert this to a vector and apply to rigidbody
@@ -272,15 +245,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void CheckDirectionToFace(FacingDirection _facing)
+    public void CheckDirectionToFace(bool isFacingRight)
     {
-        if (_facing != facing)
-            Turn();
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(_groundCheckPoint.position, _groundCheckSize);
+        if (isFacingRight)
+        {
+            if (facing != FacingDirection.Right)
+                Turn();
+        }
+        else
+        {
+            if (facing != FacingDirection.Left)
+                Turn();
+        }
     }
 }
