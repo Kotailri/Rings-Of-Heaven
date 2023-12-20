@@ -41,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform _groundCheckPoint;
     [SerializeField] private Vector2 _groundCheckSize = new(0.49f, 0.03f);
     [SerializeField] private LayerMask _groundLayer;
+    private bool isGrounded;
 
     private Rigidbody2D RB;
     private FacingDirection facing = FacingDirection.Right;
@@ -49,6 +50,11 @@ public class PlayerMovement : MonoBehaviour
     // Timers
     private float lastOnGroundTime;
     private float lastPressedJumpTime;
+
+    [Header("TEMP DEBUG")]
+    public bool OnIce;
+    public float slipperyness;
+    public float iceSpeedMultiplier;
 
     private void Awake()
     {
@@ -103,6 +109,11 @@ public class PlayerMovement : MonoBehaviour
                 // Reset grounded time, with coyote time tolerance
                 lastOnGroundTime = coyoteTime;
                 isDoubleJumping = false;
+                isGrounded = true;
+            }
+            else
+            {
+               isGrounded = false;
             }
         }
 
@@ -163,7 +174,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Run();
+        if (OnIce)
+            RunOnIce();
+        else
+            Run();
     }
 
     public void OnJumpInput()
@@ -229,6 +243,48 @@ public class PlayerMovement : MonoBehaviour
         RB.AddForce(movement * Vector2.right, ForceMode2D.Force);
     }
 
+    private void RunOnIce()
+    {
+        float targetSpeed = moveInput.x * runMaxSpeed * iceSpeedMultiplier;
+        float currVelocity = RB.velocity.x;
+        
+        if (moveInput.x == 0.0f) // trying to stop
+        {
+            if (Mathf.Abs(currVelocity) > 0.1f) // keep slowing down
+            {
+                float factor = 0f;
+                if (currVelocity < 0)
+                {
+                    factor = currVelocity + (1.0f / slipperyness);
+                }
+                else if (currVelocity > 0)
+                {
+                    factor = currVelocity - (1.0f / slipperyness);
+                }
+                RB.velocity = new Vector2(factor, RB.velocity.y);
+            }
+        }
+        else // trying to move
+        {
+            if (moveInput.x > 0.0f) // want to move right
+            {
+                if (currVelocity < targetSpeed) // keep speeding up right direction
+                {
+                    float factor = currVelocity + (1.0f / slipperyness);
+                    RB.velocity = new Vector2(factor, RB.velocity.y);
+                }
+            }
+            else if (moveInput.x < 0.0f) // want to move left
+            {
+                if (currVelocity > targetSpeed) // keep speeding up left direction
+                {
+                    float factor = currVelocity - (1.0f / slipperyness);
+                    RB.velocity = new Vector2(factor, RB.velocity.y);
+                }
+            }
+        }
+    }
+
     private void Turn()
     {
         Vector3 scale = transform.localScale;
@@ -257,5 +313,11 @@ public class PlayerMovement : MonoBehaviour
             if (facing != FacingDirection.Left)
                 Turn();
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(_groundCheckPoint.position, _groundCheckSize);
     }
 }
