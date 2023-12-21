@@ -1,9 +1,21 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class PlayerControls
 {
+    public static bool GetAttackRightPressed()
+    {
+        return Input.GetKeyDown(KeyCode.F);
+    }
+
+    public static bool GetAttackLeftPressed()
+    {
+        return Input.GetKeyDown(KeyCode.D);
+    }
+
+    #region Movememt
+
     public static bool GetLeft()
     {
         return Input.GetKey(KeyCode.LeftArrow);
@@ -63,6 +75,7 @@ public static class PlayerControls
     {
         return Input.GetKeyUp(KeyCode.DownArrow);
     }
+    #endregion
 
     public static bool GetJump()
     {

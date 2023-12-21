@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum FacingDirection
 {
-    Right, Left, Up, Down
+    Right, Left
 }
 
 public class PlayerMovement : MonoBehaviour
@@ -41,10 +41,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform _groundCheckPoint;
     [SerializeField] private Vector2 _groundCheckSize = new(0.49f, 0.03f);
     [SerializeField] private LayerMask _groundLayer;
-    private bool isGrounded;
+    [HideInInspector] public bool isGrounded;
 
     private Rigidbody2D RB;
-    private FacingDirection facing = FacingDirection.Right;
+    [HideInInspector]
+    public FacingDirection facing = FacingDirection.Right;
     private Vector2 moveInput;
 
     // Timers
@@ -109,12 +110,16 @@ public class PlayerMovement : MonoBehaviour
                 // Reset grounded time, with coyote time tolerance
                 lastOnGroundTime = coyoteTime;
                 isDoubleJumping = false;
-                isGrounded = true;
             }
-            else
-            {
-               isGrounded = false;
-            }
+        }
+
+        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
         }
 
         // After jump, now falling = no longer jumping
@@ -224,7 +229,6 @@ public class PlayerMovement : MonoBehaviour
     {
         //Calculate the direction we want to move in and our desired velocity
         float targetSpeed = moveInput.x * runMaxSpeed;
-        //targetSpeed = Mathf.Lerp(RB.velocity.x, targetSpeed, 0.5f * Time.deltaTime);
 
         // Apply acceleration/decceleration
         float accelRate;
