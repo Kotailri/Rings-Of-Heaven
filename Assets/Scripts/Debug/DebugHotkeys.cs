@@ -12,5 +12,15 @@ public class DebugHotkeys : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+
+        if (Input.GetKeyDown(KeyCode.Equals))
+        {
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().Heal(1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Minus))
+        {
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().TakeDamage(1);
+        }
     }
 }
