@@ -71,6 +71,10 @@ public class ThrowRing : MonoBehaviour
     public Vector2 ringBlockedSize = new(0.49f, 0.03f);
     public LayerMask ringBlockLayer;
 
+    [Space(10f)]
+    public float ringThrowCooldown;
+    private bool canThrow = true;
+
     private PlayerFacing pf;
     private List<ThrowableRing> ThrowableRingList = new();
 
@@ -93,6 +97,13 @@ public class ThrowRing : MonoBehaviour
         }
     }
 
+    private IEnumerator WaitThrowCooldown()
+    {
+        canThrow = false;
+        yield return new WaitForSecondsRealtime(ringThrowCooldown);
+        canThrow = true;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -102,6 +113,15 @@ public class ThrowRing : MonoBehaviour
 
     private void Throw(ThrowableRing tr)
     {
+        if (canThrow)
+        {
+            StartCoroutine(WaitThrowCooldown());
+        }
+        else
+        {
+            return;
+        }
+
         Vector2 throwdir = transform.position;
         float rangeHorizontal = 2.0f;
         float rangeVertical = 2.0f;

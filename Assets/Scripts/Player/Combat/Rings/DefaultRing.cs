@@ -5,7 +5,7 @@ using UnityEngine;
 public class DefaultRing : Ring, IRingCatchable, IRingReturn
 {
     private int ringDamage = 1;
-    private float ringSpeed = 25.0f;
+    private float ringSpeed = 45.0f;
 
     private bool catchable = false;
     private bool returning = false;

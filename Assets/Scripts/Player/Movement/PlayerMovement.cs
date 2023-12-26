@@ -289,7 +289,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Turn()
+    private void Turn2()
     {
         Vector3 scale = transform.localScale;
         scale.x *= -1;
@@ -301,6 +301,24 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
+            facing = FacingDirection.Right;
+        }
+    }
+
+    private void Turn()
+    {
+        if (facing == FacingDirection.Right)
+        {
+            Vector3 rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
+            transform.rotation = Quaternion.Euler(rotator);
+
+            facing = FacingDirection.Left;
+        }
+        else
+        {
+            Vector3 rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
+            transform.rotation = Quaternion.Euler(rotator);
+
             facing = FacingDirection.Right;
         }
     }
