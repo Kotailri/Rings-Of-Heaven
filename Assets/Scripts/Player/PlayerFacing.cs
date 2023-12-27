@@ -24,34 +24,28 @@ public class PlayerFacing : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerControls.GetUp())
+        if (PlayerControls.GetUp() && !PlayerControls.GetDown())
         {
             facingDirection = PlayerFacingDirection.Up;
             return;
         }
 
-        if (PlayerControls.GetLeft() && !PlayerControls.GetRight())
+        if (PlayerControls.GetDown() && !PlayerControls.GetUp())
+        {
+            facingDirection = PlayerFacingDirection.Down;
+            return;
+        }
+
+        if (pm.facing == PlayerRBFacingDirection.Left)
         {
             facingDirection = PlayerFacingDirection.Left;
             return;
         }
 
-        if (PlayerControls.GetRight() && !PlayerControls.GetLeft())
+        if (pm.facing == PlayerRBFacingDirection.Right)
         {
             facingDirection = PlayerFacingDirection.Right;
             return;
-        }
-
-        if (facingDirection == PlayerFacingDirection.Up)
-        {
-            if (pm.facing == FacingDirection.Left) 
-            {
-                facingDirection = PlayerFacingDirection.Left;
-            }
-            else
-            {
-                facingDirection = PlayerFacingDirection.Right;
-            }
         }
     }
 }

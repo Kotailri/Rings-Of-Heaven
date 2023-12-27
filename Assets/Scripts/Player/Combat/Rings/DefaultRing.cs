@@ -69,7 +69,7 @@ public class DefaultRing : Ring, IRingCatchable, IRingReturn
         targetPosition = (Vector2) player.transform.position;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (!IsReturning() && collision.gameObject.TryGetComponent(out TagManager tagManager))
         {

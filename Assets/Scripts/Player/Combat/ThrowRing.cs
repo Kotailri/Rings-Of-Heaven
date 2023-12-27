@@ -66,6 +66,7 @@ public class ThrowRing : MonoBehaviour
     [Space(10f)]
     public Transform ringBlockFront;
     public Transform ringBlockUp;
+    public Transform ringBlockDown;
 
     [Space(10f)]
     public Vector2 ringBlockedSize = new(0.49f, 0.03f);
@@ -109,6 +110,7 @@ public class ThrowRing : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(ringBlockFront.position, ringBlockedSize);
         Gizmos.DrawWireCube(ringBlockUp.position, ringBlockedSize);
+        Gizmos.DrawWireCube(ringBlockDown.position, ringBlockedSize);
     }
 
     private void Throw(ThrowableRing tr)
@@ -150,6 +152,9 @@ public class ThrowRing : MonoBehaviour
                 break;
 
             case PlayerFacingDirection.Down:
+                if (Physics2D.OverlapBox(ringBlockDown.position, ringBlockedSize, 0, ringBlockLayer))
+                    return;
+
                 throwdir += new Vector2(0, -rangeVertical);
                 break;
         }

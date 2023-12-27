@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum FacingDirection
+public enum PlayerRBFacingDirection
 {
     Right, Left
 }
@@ -45,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D RB;
     [HideInInspector]
-    public FacingDirection facing = FacingDirection.Right;
+    public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
     private Vector2 moveInput;
 
     // Timers
@@ -57,14 +57,17 @@ public class PlayerMovement : MonoBehaviour
     public float slipperyness;
     public float iceSpeedMultiplier;
 
+    private bool canMove = true;
+    private PlayerRBFacingDirection lastDirectionInput = PlayerRBFacingDirection.Right;
+
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
     }
 
-    public Vector2 GetVelocity()
+    public void ToggleMovement(bool _canMove)
     {
-        return RB.velocity;
+        canMove = _canMove;
     }
 
     private void Update()
@@ -74,30 +77,55 @@ public class PlayerMovement : MonoBehaviour
         lastPressedJumpTime -= Time.deltaTime;
 
         // Get the x moveinput to:  0 for not moving, -1 for left, +1 for right 
-        moveInput.x = Utility.BoolToInt(PlayerControls.GetRight()) - Utility.BoolToInt(PlayerControls.GetLeft());
+        if (canMove)
+            moveInput.x = Utility.BoolToInt(PlayerControls.GetRight()) - Utility.BoolToInt(PlayerControls.GetLeft());
+        else
+            moveInput.x = 0;
+
+        if (PlayerControls.GetRightPressed())
+        {
+            lastDirectionInput = PlayerRBFacingDirection.Right;
+        }
+
+        if (PlayerControls.GetLeftPressed())
+        {
+            lastDirectionInput = PlayerRBFacingDirection.Left;
+        }
 
         // Change the facing direction when new movement direction is different from current
-        if (moveInput.x != 0)
+        if (moveInput.x == 0)
+        {
+            
+            if (facing != lastDirectionInput)
+            {
+                Turn();
+            }
+        }
+        else
         {
             if (moveInput.x > 0)
             {
                 CheckDirectionToFace(true);
             }
-            else
+
+            if (moveInput.x < 0)
             {
                 CheckDirectionToFace(false);
             }
         }
 
         #region Jump Inputs
-        if (PlayerControls.GetJumpPressed()) 
+        if (canMove)
         {
-            OnJumpInput();
-        }
+            if (PlayerControls.GetJumpPressed())
+            {
+                OnJumpInput();
+            }
 
-        if (PlayerControls.GetJumpReleased())
-        {
-            OnJumpUpInput();
+            if (PlayerControls.GetJumpReleased())
+            {
+                OnJumpUpInput();
+            }
         }
         #endregion
 
@@ -289,37 +317,21 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Turn2()
-    {
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
-
-        if (facing == FacingDirection.Right) 
-        {
-            facing = FacingDirection.Left;
-        }
-        else
-        {
-            facing = FacingDirection.Right;
-        }
-    }
-
     private void Turn()
     {
-        if (facing == FacingDirection.Right)
+        if (facing == PlayerRBFacingDirection.Right)
         {
             Vector3 rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
             transform.rotation = Quaternion.Euler(rotator);
 
-            facing = FacingDirection.Left;
+            facing = PlayerRBFacingDirection.Left;
         }
         else
         {
             Vector3 rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
             transform.rotation = Quaternion.Euler(rotator);
 
-            facing = FacingDirection.Right;
+            facing = PlayerRBFacingDirection.Right;
         }
     }
 
@@ -327,12 +339,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isFacingRight)
         {
-            if (facing != FacingDirection.Right)
+            if (facing != PlayerRBFacingDirection.Right)
                 Turn();
         }
         else
         {
-            if (facing != FacingDirection.Left)
+            if (facing != PlayerRBFacingDirection.Left)
                 Turn();
         }
     }
