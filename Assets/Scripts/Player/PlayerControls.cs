@@ -14,6 +14,11 @@ public static class PlayerControls
         return Input.GetKeyDown(KeyCode.D);
     }
 
+    public static bool GetDashPressed()
+    {
+        return Input.GetKeyDown(KeyCode.LeftShift);
+    }
+
     #region Movememt
 
     public static bool GetLeft()

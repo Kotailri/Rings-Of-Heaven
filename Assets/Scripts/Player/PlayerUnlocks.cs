@@ -5,4 +5,5 @@ using UnityEngine;
 public static class PlayerUnlocks
 {
     public static bool isDoubleJumpUnlocked = true;
+    public static bool isDashUnlocked = true;
 }

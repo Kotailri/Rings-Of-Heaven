@@ -4,15 +4,68 @@ using UnityEngine;
 
 public class PlayerDash : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public float DashForce;
+    public float DashCooldown;
+
+    [Space(10)]
+    public ParticleSystem DashParticle;
+    public ParticleSystem CooldownIndicationParticle;
+
+    private Rigidbody2D RB;
+    private PlayerMovement pm;
+
+    private float blockedMovementTime = 0.1f;
+
+    private bool canDash = true;
+
+    private void Awake()
     {
-        
+        RB = GetComponent<Rigidbody2D>();
+        pm = GetComponent<PlayerMovement>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Dash()
     {
-        
+        Vector2 dashDirection = Vector2.zero;
+        if (pm.facing == PlayerRBFacingDirection.Left)
+        {
+            dashDirection = Vector2.left;
+        }
+
+        if (pm.facing == PlayerRBFacingDirection.Right)
+        {
+            dashDirection = Vector2.right;
+        }
+
+        RB.velocity = Vector2.zero;
+        RB.AddForce(dashDirection * DashForce, ForceMode2D.Impulse);
+
+        DashParticle.Play();
+
+        StartCoroutine(WaitDashCooldown());
+        StartCoroutine(BlockMovement());
+    }
+
+    private void Update()
+    {
+        if (PlayerUnlocks.isDashUnlocked && PlayerControls.GetDashPressed() && canDash)
+        {
+            Dash();
+        }
+    }
+
+    private IEnumerator WaitDashCooldown()
+    {
+        canDash = false;
+        yield return new WaitForSecondsRealtime(DashCooldown);
+        canDash = true;
+        CooldownIndicationParticle.Play();
+    }
+
+    private IEnumerator BlockMovement()
+    {
+        pm.ToggleMovement(false);
+        yield return new WaitForSecondsRealtime(blockedMovementTime);
+        pm.ToggleMovement(true);
     }
 }
