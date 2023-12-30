@@ -43,6 +43,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
     [HideInInspector] public bool isGrounded;
 
+    [Space(15)]
+    public ParticleSystem dustParticles;
+
     private Rigidbody2D RB;
     [HideInInspector]
     public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
@@ -181,6 +184,7 @@ public class PlayerMovement : MonoBehaviour
             RB.velocity = new Vector2(RB.velocity.x, 0); // Zero the fall speed
 
             RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Apply Jump
+            dustParticles.Play();
         }
 
         // jump cut if jump released while ascending from double jump
@@ -319,20 +323,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void Turn()
     {
+        Vector3 rotator;
+
         if (facing == PlayerRBFacingDirection.Right)
         {
-            Vector3 rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
-            transform.rotation = Quaternion.Euler(rotator);
-
+            rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
             facing = PlayerRBFacingDirection.Left;
         }
         else
         {
-            Vector3 rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
-            transform.rotation = Quaternion.Euler(rotator);
-
+            rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
             facing = PlayerRBFacingDirection.Right;
         }
+
+        transform.rotation = Quaternion.Euler(rotator);
+
+        if (isGrounded)
+        {
+            dustParticles.Play();
+        }
+            
     }
 
     public void CheckDirectionToFace(bool isFacingRight)
