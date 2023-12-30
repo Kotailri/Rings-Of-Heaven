@@ -125,6 +125,7 @@ public class ThrowRing : MonoBehaviour
         }
 
         Vector2 throwdir = transform.position;
+        Vector3 ringAngle = Vector3.zero;
         float rangeHorizontal = 2.0f;
         float rangeVertical = 2.0f;
 
@@ -148,6 +149,7 @@ public class ThrowRing : MonoBehaviour
                 if (Physics2D.OverlapBox(ringBlockUp.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
+                ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, 90);
                 throwdir += new Vector2(0, rangeVertical);
                 break;
 
@@ -155,11 +157,12 @@ public class ThrowRing : MonoBehaviour
                 if (Physics2D.OverlapBox(ringBlockDown.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
+                ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, -90);
                 throwdir += new Vector2(0, -rangeVertical);
                 break;
         }
 
-        tr.RingReference = Instantiate(tr.RingObject, throwdir, Quaternion.identity);
+        tr.RingReference = Instantiate(tr.RingObject, throwdir, Quaternion.Euler(ringAngle));
         tr.RingReference.GetComponent<Ring>().SendRing(pf.GetFacingDirection());
     }
 }
