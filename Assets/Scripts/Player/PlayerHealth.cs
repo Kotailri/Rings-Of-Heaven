@@ -36,6 +36,8 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth -= damageAmount;
 
+        Global.vignetteTween.SetVignetteDamage();
+
         // Ensure health doesn't go below zero
         if (currentHealth < 0)
         {
@@ -82,6 +84,9 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Utility.InvokeLambda(() =>
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }, 0.25f);
     }
 }

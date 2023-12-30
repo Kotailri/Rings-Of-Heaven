@@ -12,6 +12,11 @@ public class VignetteTween : MonoBehaviour
 
     private bool isTweening = false;
 
+    private void Awake()
+    {
+        Global.vignetteTween = this;
+    }
+
     public void SetVignetteDamage()
     {
         if (isTweening)
@@ -43,14 +48,6 @@ public class VignetteTween : MonoBehaviour
 
         yield return new WaitForSeconds(alphaIncrementTime);
         StartCoroutine(IncrementAlpha());
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Y)) 
-        {
-            SetVignetteDamage();
-        }
     }
 
     private Color GetVignetteColor()
