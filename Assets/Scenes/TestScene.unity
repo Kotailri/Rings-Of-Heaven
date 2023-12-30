@@ -1673,6 +1673,7 @@ GameObject:
   - component: {fileID: 1524108155}
   - component: {fileID: 1524108159}
   - component: {fileID: 1524108156}
+  - component: {fileID: 1524108165}
   - component: {fileID: 1524108160}
   - component: {fileID: 1524108161}
   - component: {fileID: 1524108162}
@@ -1727,19 +1728,6 @@ MonoBehaviour:
   runMaxSpeed: 9.5
   runAccelAmount: 20
   runDeccelAmount: 20
-  gravityScale: 1.7333333
-  fallGravityMult: 2
-  maxFallSpeed: 18
-  jumpForce: 26
-  jumpCutGravityMult: 3
-  coyoteTime: 0.2
-  jumpInputBufferTime: 0.2
-  _groundCheckPoint: {fileID: 1205619691}
-  _groundCheckSize: {x: 1.39, y: 0.03}
-  _groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  isGrounded: 0
   dustParticles: {fileID: 2051715854}
   facing: 0
   OnIce: 0
@@ -1895,6 +1883,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerSprite: {fileID: 604196733}
+--- !u!114 &1524108165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524108154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a68df21c15f100846b06441ee837743a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravityScale: 1.7
+  fallGravityMult: 2
+  maxFallSpeed: 18
+  jumpForce: 26
+  jumpCutGravityMult: 3
+  coyoteTime: 0.2
+  jumpInputBufferTime: 0.2
+  _groundCheckPoint: {fileID: 1205619691}
+  _groundCheckSize: {x: 0.49, y: 0.03}
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  isGrounded: 0
+  dustParticles: {fileID: 2051715854}
 --- !u!1 &1549744122
 GameObject:
   m_ObjectHideFlags: 3
