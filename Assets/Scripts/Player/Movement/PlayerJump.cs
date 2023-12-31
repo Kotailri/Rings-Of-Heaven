@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
@@ -43,16 +44,23 @@ public class PlayerJump : MonoBehaviour
     private float lastOnGroundTime;
     private float lastPressedJumpTime;
 
+    private Controls controls;
+
     private void Awake()
     {
+        controls = new Controls();
+        controls.Gameplay.Jump.started += ctx => OnJumpInput();
+        controls.Gameplay.Jump.started += ctx => CheckDoubleJump();
+        controls.Gameplay.Jump.canceled += ctx => OnJumpUpInput();
+
+        controls.Gameplay.Enable();
+
         RB = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
     {
         UpdateTimers();
-
-        CheckJumpInputs();
         CheckGrounded();
         
         // After jump, now falling = no longer jumping
@@ -74,8 +82,6 @@ public class PlayerJump : MonoBehaviour
             _isJumpCut = false; // Reset jump cut when new jump
             Jump(); // Do jump
         }
-
-        CheckDoubleJump();
 
         // jump cut if jump released while ascending from double jump
         if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
@@ -120,26 +126,10 @@ public class PlayerJump : MonoBehaviour
         canMove = _canMove;
     }
 
-    private void CheckJumpInputs()
-    {
-        if (canMove)
-        {
-            if (PlayerControls.GetJumpPressed())
-            {
-                OnJumpInput();
-            }
-
-            if (PlayerControls.GetJumpReleased())
-            {
-                OnJumpUpInput();
-            }
-        }
-    }
-
     private void CheckDoubleJump()
     {
         // jump unlocked, not grounded, not currently double jumping, jump input
-        if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping && PlayerControls.GetJumpPressed())
+        if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping)
         {
             isDoubleJumping = true; // Is now double jumping
 
@@ -168,6 +158,9 @@ public class PlayerJump : MonoBehaviour
 
     private void OnJumpInput()
     {
+        if (!canMove)
+            return;
+
         // when jump is pressed
         // set last pressed jump time to the tolerance
         // during the tolerance time, a jump is always being "pressed"

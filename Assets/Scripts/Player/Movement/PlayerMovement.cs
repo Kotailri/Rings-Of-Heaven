@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public enum PlayerRBFacingDirection
@@ -30,10 +31,27 @@ public class PlayerMovement : MonoBehaviour
     public float iceSpeedMultiplier;
 
     private bool canMove = true;
-    private PlayerRBFacingDirection lastDirectionInput = PlayerRBFacingDirection.Right;
+
+    private Controls controls;
+
+    private float axisInputX;
+
+    private float keyboardLeft;
+    private float keyboardRight;
 
     private void Awake()
     {
+        controls = new Controls();
+        controls.Gameplay.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
+
+        controls.Gameplay.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
+        controls.Gameplay.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
+
+        controls.Gameplay.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
+        controls.Gameplay.KeyboardRight.canceled += ctx => keyboardRight = 0;
+
+        controls.Gameplay.Enable();
+
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
     }
@@ -46,32 +64,33 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        // Get the x moveinput to:  0 for not moving, -1 for left, +1 for right 
+        // Get the x moveinput
+        float controllerInputX = 0;
+        if (Mathf.Abs(axisInputX) >= Config.ControllerDeadZone)
+        {
+            controllerInputX = axisInputX;
+        }
+
+        float keyboardInputX = keyboardRight - keyboardLeft;
+
         if (canMove)
-            moveInput.x = Utility.BoolToInt(PlayerControls.GetRight()) - Utility.BoolToInt(PlayerControls.GetLeft());
-        else
-            moveInput.x = 0;
-
-        if (PlayerControls.GetRightPressed())
         {
-            lastDirectionInput = PlayerRBFacingDirection.Right;
-        }
-
-        if (PlayerControls.GetLeftPressed())
-        {
-            lastDirectionInput = PlayerRBFacingDirection.Left;
-        }
-
-        // Change the facing direction when new movement direction is different from current
-        if (moveInput.x == 0)
-        {
-            
-            if (facing != lastDirectionInput)
+            if (controllerInputX != 0)
             {
-                Turn();
+                moveInput.x = controllerInputX;
+            }
+            else
+            {
+                moveInput.x = keyboardInputX;
             }
         }
         else
+        {
+            moveInput.x = 0;
+        }
+
+        // Change the facing direction when new movement direction is different from current
+        if (moveInput.x != 0)
         {
             if (moveInput.x > 0)
             {

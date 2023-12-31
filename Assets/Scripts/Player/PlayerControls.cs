@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class PlayerControls
 {
-    public static bool GetAttackRightPressed()
+    /*public static bool GetAttackRightPressed()
     {
         return Input.GetKeyDown(KeyCode.F);
     }
@@ -12,7 +12,7 @@ public static class PlayerControls
     public static bool GetAttackLeftPressed()
     {
         return Input.GetKeyDown(KeyCode.D);
-    }
+    }*/
 
     public static bool GetDashPressed()
     {
@@ -96,4 +96,5 @@ public static class PlayerControls
     {
         return Input.GetKeyUp(KeyCode.Space);
     }
+    
 }

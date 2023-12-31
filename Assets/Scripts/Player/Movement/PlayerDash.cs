@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class PlayerDash : MonoBehaviour
@@ -18,8 +19,15 @@ public class PlayerDash : MonoBehaviour
 
     private bool canDash = true;
 
+    private Controls controls;
+
     private void Awake()
     {
+        controls = new Controls();
+        controls.Gameplay.Dash.started += ctx => Dash();
+
+        controls.Gameplay.Enable();
+
         RB = GetComponent<Rigidbody2D>();
         pm = GetComponent<PlayerMovement>();
     }

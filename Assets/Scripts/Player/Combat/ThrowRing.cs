@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public delegate bool ThrowInputFunction();
@@ -15,30 +16,14 @@ public class ThrowableRing
 
     public bool CheckRingThrow()
     {
-        if (ThrowInputPressed())
-        {
-            CheckRingRecieved();
+        CheckRingRecieved();
 
-            if (HoldingRing)
-            {
-                HoldingRing = false;
-                return true;
-            }
+        if (HoldingRing)
+        {
+            HoldingRing = false;
+            return true;
         }
         return false;
-    }
-
-    private bool ThrowInputPressed()
-    {
-        if (throwInputFunction != null)
-        {
-            return throwInputFunction();
-        }
-        else
-        {
-            Utility.PrintWarn("Throw Input Function Not Found at " + RingName);
-            return false;
-        }
     }
 
     private void CheckRingRecieved()
@@ -49,9 +34,8 @@ public class ThrowableRing
         }
     }
 
-    public ThrowableRing(string _RingName, GameObject _RingObject, ThrowInputFunction InputFunction) 
+    public ThrowableRing(string _RingName, GameObject _RingObject) 
     {
-        throwInputFunction = InputFunction;
         RingName = _RingName;
         RingObject = _RingObject;
         HoldingRing = true;
@@ -79,22 +63,37 @@ public class ThrowRing : MonoBehaviour
     private PlayerFacing pf;
     private List<ThrowableRing> ThrowableRingList = new();
 
+    private Controls controls;
+
     private void Awake()
     {
+        controls = new Controls();
+        controls.Gameplay.AttackLeft.started += ctx => ThrowLeftRing();
+        controls.Gameplay.AttackRight.started += ctx => ThrowRightRing();
+
+        controls.Gameplay.Enable();
+
         pf = GetComponent<PlayerFacing>();
 
-        ThrowableRingList.Add(new ThrowableRing("Left Ring", LeftRingObj, PlayerControls.GetAttackLeftPressed));
-        ThrowableRingList.Add(new ThrowableRing("Right Ring", RightRingObj, PlayerControls.GetAttackRightPressed));
+        ThrowableRingList.Add(new ThrowableRing("Left Ring", LeftRingObj));
+        ThrowableRingList.Add(new ThrowableRing("Right Ring", RightRingObj));
     }
 
-    private void Update()
+    private void ThrowLeftRing()
     {
-        foreach (ThrowableRing tr in ThrowableRingList)
+        ThrowableRing tr = ThrowableRingList[0];
+        if (tr.CheckRingThrow())
         {
-            if (tr.CheckRingThrow())
-            {
-                Throw(tr);
-            }
+            Throw(tr);
+        }
+    }
+
+    private void ThrowRightRing()
+    {
+        ThrowableRing tr = ThrowableRingList[1];
+        if (tr.CheckRingThrow())
+        {
+            Throw(tr);
         }
     }
 
