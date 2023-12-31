@@ -53,7 +53,15 @@ public class EnemyHealth : MonoBehaviour
     {
         if (currentHealth <= 0) 
         {
-            // TEMP DIE CODE
+            if (TryGetComponent(out DeathEffect death))
+            {
+                if (death != null)
+                {
+                    death.DoDeathEffect();
+                    return;
+                }
+            }
+            
             Destroy(gameObject);
         }
     }

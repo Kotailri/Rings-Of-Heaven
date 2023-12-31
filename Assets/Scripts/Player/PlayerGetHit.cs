@@ -31,10 +31,15 @@ public class PlayerGetHit : MonoBehaviour
         }
     }
 
-    private void ApplyHit(int damage, Vector2 hitPosition)
+    public void ApplyHit(int damage, Vector2 hitPosition, bool withKnockback=true)
     {
         health.TakeDamage(damage);
-        knockback.DoKnockback(knockbackForce, stunDuration, hitPosition);
+
+        if (withKnockback)
+        {
+            knockback.DoKnockback(knockbackForce, stunDuration, hitPosition);
+        }
+        
         StartCoroutine(ApplyIFrames(invincibilityDuration));
     }
 

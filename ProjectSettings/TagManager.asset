@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - CameraFollowObject
+  - RespawnsPlayer
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
