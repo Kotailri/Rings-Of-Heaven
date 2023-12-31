@@ -1,18 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    public int currentScore = 0;
+    public TextMeshProUGUI scoreText;
+
+    private int totalPossibleScore = 0;
+
+    private void Awake()
     {
-        
+        Managers.scoreManager = this;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        totalPossibleScore = GameObject.FindGameObjectsWithTag("ScoreAdder").Length;
+        UpdateScoreUI();
+    }
+
+    public void AddScore(int score)
+    {
+        currentScore += score;
+        UpdateScoreUI();
+    }
+
+    private void UpdateScoreUI()
+    {
+        scoreText.text = "Score: " + currentScore + " / " + totalPossibleScore;
     }
 }
