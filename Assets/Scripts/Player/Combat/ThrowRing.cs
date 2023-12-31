@@ -70,6 +70,7 @@ public class ThrowRing : MonoBehaviour
         controls = new Controls();
         controls.Gameplay.AttackLeft.started += ctx => ThrowLeftRing();
         controls.Gameplay.AttackRight.started += ctx => ThrowRightRing();
+        controls.Gameplay.Attack.started += ctx => ThrowBothRings();
 
         controls.Gameplay.Enable();
 
@@ -94,6 +95,18 @@ public class ThrowRing : MonoBehaviour
         if (tr.CheckRingThrow())
         {
             Throw(tr);
+        }
+    }
+
+    private void ThrowBothRings()
+    {
+        foreach (ThrowableRing throwableRing in ThrowableRingList)
+        {
+            if (throwableRing.CheckRingThrow())
+            {
+                Throw(throwableRing);
+                return;
+            }
         }
     }
 

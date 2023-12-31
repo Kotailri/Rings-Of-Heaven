@@ -51,7 +51,9 @@ public class PlayerJump : MonoBehaviour
         controls = new Controls();
         controls.Gameplay.Jump.started += ctx => OnJumpInput();
         controls.Gameplay.Jump.started += ctx => CheckDoubleJump();
+
         controls.Gameplay.Jump.canceled += ctx => OnJumpUpInput();
+        controls.Gameplay.Jump.canceled += ctx => JumpCutDoubleJump();
 
         controls.Gameplay.Enable();
 
@@ -84,12 +86,20 @@ public class PlayerJump : MonoBehaviour
         }
 
         // jump cut if jump released while ascending from double jump
-        if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
+        //if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
+        //{
+        //    _isJumpCut = true;
+        //}
+
+        ApplyGravity();
+    }
+
+    private void JumpCutDoubleJump()
+    {
+        if (isDoubleJumping && RB.velocity.y > 0)
         {
             _isJumpCut = true;
         }
-
-        ApplyGravity();
     }
 
     private void UpdateTimers()

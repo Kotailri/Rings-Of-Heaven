@@ -34,31 +34,26 @@ public class PlayerDash : MonoBehaviour
 
     public void Dash()
     {
-        Vector2 dashDirection = Vector2.zero;
-        if (pm.facing == PlayerRBFacingDirection.Left)
+        if (PlayerUnlocks.isDashUnlocked && canDash)
         {
-            dashDirection = Vector2.left;
-        }
+            Vector2 dashDirection = Vector2.zero;
+            if (pm.facing == PlayerRBFacingDirection.Left)
+            {
+                dashDirection = Vector2.left;
+            }
 
-        if (pm.facing == PlayerRBFacingDirection.Right)
-        {
-            dashDirection = Vector2.right;
-        }
+            if (pm.facing == PlayerRBFacingDirection.Right)
+            {
+                dashDirection = Vector2.right;
+            }
 
-        RB.velocity = Vector2.zero;
-        RB.AddForce(dashDirection * DashForce, ForceMode2D.Impulse);
+            RB.velocity = Vector2.zero;
+            RB.AddForce(dashDirection * DashForce, ForceMode2D.Impulse);
 
-        DashParticle.Play();
+            DashParticle.Play();
 
-        StartCoroutine(WaitDashCooldown());
-        StartCoroutine(BlockMovement());
-    }
-
-    private void Update()
-    {
-        if (PlayerUnlocks.isDashUnlocked && PlayerControls.GetDashPressed() && canDash)
-        {
-            Dash();
+            StartCoroutine(WaitDashCooldown());
+            StartCoroutine(BlockMovement());
         }
     }
 

@@ -5,22 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class DebugHotkeys : MonoBehaviour
 {
-    // Update is called once per frame
-    void Update()
+    private Controls controls;
+
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        controls = new Controls();
+        controls.Gameplay.Restart.started += ctx => RestartGame();
+        controls.Enable();
+    }
 
-        if (Input.GetKeyDown(KeyCode.Equals))
-        {
-            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().Heal(1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Minus))
-        {
-            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().TakeDamage(1);
-        }
+    private void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
