@@ -29,6 +29,7 @@ public class EnemyTakeDamage : MonoBehaviour
             {
                 ApplyDamage(ring);
                 GetKnockedBack();
+                GetComponent<Animator>().SetTrigger("hit");
                 damageParticles.Play();
             }
         }
