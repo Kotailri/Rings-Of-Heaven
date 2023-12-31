@@ -5,9 +5,18 @@ using UnityEngine;
 
 public class EnemyTakeDamage : MonoBehaviour
 {
+    public ParticleSystem damageParticles;
     public bool CanTakeDamage = true;
+    public float knockbackMultiplier;
+
+    private Rigidbody2D RB;
 
     private List<int> ringIds = new();
+
+    private void Awake()
+    {
+        RB = GetComponent<Rigidbody2D>();
+    }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -19,6 +28,8 @@ public class EnemyTakeDamage : MonoBehaviour
             if (CheckIfCanDamage(ring.gameObject))
             {
                 ApplyDamage(ring);
+                GetKnockedBack();
+                damageParticles.Play();
             }
         }
     }
@@ -31,6 +42,22 @@ public class EnemyTakeDamage : MonoBehaviour
         {
             ringIds.Remove(collision.gameObject.GetInstanceID());
         }
+    }
+
+    private void GetKnockedBack()
+    {
+        Vector2 knockbackDirection = transform.position - GameObject.FindGameObjectWithTag("Player").transform.position;
+
+        if (TryGetComponent(out StunnedByRing stun))
+        {
+            stun.GetStunned();
+        }
+        else
+        {
+            RB.velocity = Vector2.zero;
+        }
+
+        RB.AddForce(knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
     }
 
     private bool CheckIfCanDamage(GameObject ring)

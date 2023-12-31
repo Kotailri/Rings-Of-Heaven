@@ -31,6 +31,7 @@ public class EnemyHealth : MonoBehaviour
     public void RemoveHealth(int _hp)
     {
         currentHealth -= _hp;
+        
         BalanceHealth();
         CheckDeath();
     }
