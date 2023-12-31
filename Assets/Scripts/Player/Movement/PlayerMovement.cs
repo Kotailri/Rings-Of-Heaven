@@ -39,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
     private float keyboardLeft;
     private float keyboardRight;
 
+    private Animator animator;
+
     private void Awake()
     {
         controls = new Controls();
@@ -52,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
 
         controls.Gameplay.Enable();
 
+        animator = GetComponent<Animator>();
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
     }
@@ -92,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
         // Change the facing direction when new movement direction is different from current
         if (moveInput.x != 0)
         {
+            animator.SetBool("isWalking", true);
             if (moveInput.x > 0)
             {
                 CheckDirectionToFace(true);
@@ -101,6 +105,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 CheckDirectionToFace(false);
             }
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
         }
     }
 

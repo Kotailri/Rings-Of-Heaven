@@ -127,14 +127,12 @@ public class ThrowRing : MonoBehaviour
 
     private void Throw(ThrowableRing tr)
     {
-        if (canThrow)
-        {
-            StartCoroutine(WaitThrowCooldown());
-        }
-        else
+        if (!canThrow)
         {
             return;
         }
+
+        StartCoroutine(WaitThrowCooldown());
 
         Vector2 throwdir = transform.position;
         Vector3 ringAngle = Vector3.zero;

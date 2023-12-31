@@ -73,7 +73,7 @@ public class PlayerHealth : MonoBehaviour
     }
 
     // Update the UI to represent the current health
-    void UpdateHealthUI()
+    protected void UpdateHealthUI()
     {
         for (int i = 0; i < healthImages.Length; i++)
         {
@@ -82,11 +82,8 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    void Die()
+    public void Die()
     {
-        Utility.InvokeLambda(() =>
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }, 0.25f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

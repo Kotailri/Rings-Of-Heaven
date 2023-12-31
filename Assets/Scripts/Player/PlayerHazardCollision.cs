@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHazardCollision : MonoBehaviour
 {
@@ -37,12 +38,17 @@ public class PlayerHazardCollision : MonoBehaviour
 
     private void RespawnPlayer(Transform other)
     {
+        if (GetComponent<PlayerHealth>().currentHealth == 1)
+        {
+            GetComponent<PlayerHealth>().Die();
+            return;
+        }
+
         transform.position = currentCheckpoint;
 
         pm.ToggleMovement(false);
         hit.ApplyHit(1, other.position, false);
-        StartCoroutine(EnableMovement());
-        
+        StartCoroutine(EnableMovement());   
     }
 
     private IEnumerator EnableMovement()
