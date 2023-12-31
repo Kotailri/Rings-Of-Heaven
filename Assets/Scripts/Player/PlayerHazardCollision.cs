@@ -20,16 +20,13 @@ public class PlayerHazardCollision : MonoBehaviour
         currentCheckpoint = transform.position;
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("RespawnsPlayer"))
         {
             RespawnPlayer(collision.gameObject.transform);
         }
-    }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
         if (collision.gameObject.CompareTag("Checkpoint"))
         {
             currentCheckpoint = collision.gameObject.transform.position;
@@ -38,17 +35,17 @@ public class PlayerHazardCollision : MonoBehaviour
 
     private void RespawnPlayer(Transform other)
     {
-        if (GetComponent<PlayerHealth>().currentHealth == 1)
+        if (GetComponent<PlayerHealth>().currentHealth > 1)
         {
-            GetComponent<PlayerHealth>().Die();
-            return;
+            transform.position = currentCheckpoint;
+
+            pm.ToggleMovement(false);
+            
+            StartCoroutine(EnableMovement());
         }
 
-        transform.position = currentCheckpoint;
-
-        pm.ToggleMovement(false);
         hit.ApplyHit(1, other.position, false);
-        StartCoroutine(EnableMovement());   
+
     }
 
     private IEnumerator EnableMovement()

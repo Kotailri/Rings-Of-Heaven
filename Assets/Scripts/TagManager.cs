@@ -5,7 +5,8 @@ public enum Tags
 {
     DamagesPlayer,
     DamagedByPlayer,
-    BouncesRing
+    BouncesRing,
+    BrokeByRing
 }
 
 public class TagManager : MonoBehaviour

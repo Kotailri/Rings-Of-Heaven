@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerDash : MonoBehaviour
 {
@@ -19,22 +20,15 @@ public class PlayerDash : MonoBehaviour
 
     private bool canDash = true;
 
-    private Controls controls;
-
     private void Awake()
     {
-        controls = new Controls();
-        controls.Gameplay.Dash.started += ctx => Dash();
-
-        controls.Gameplay.Enable();
-
         RB = GetComponent<Rigidbody2D>();
         pm = GetComponent<PlayerMovement>();
     }
 
-    public void Dash()
+    public void Dash(InputAction.CallbackContext context)
     {
-        if (PlayerUnlocks.isDashUnlocked && canDash)
+        if (PlayerUnlocks.isDashUnlocked && canDash && context.phase == InputActionPhase.Started)
         {
             Vector2 dashDirection = Vector2.zero;
             if (pm.facing == PlayerRBFacingDirection.Left)

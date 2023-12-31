@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerJump : MonoBehaviour
 {
@@ -44,20 +45,24 @@ public class PlayerJump : MonoBehaviour
     private float lastOnGroundTime;
     private float lastPressedJumpTime;
 
-    private Controls controls;
-
     private void Awake()
     {
-        controls = new Controls();
-        controls.Gameplay.Jump.started += ctx => OnJumpInput();
-        controls.Gameplay.Jump.started += ctx => CheckDoubleJump();
-
-        controls.Gameplay.Jump.canceled += ctx => OnJumpUpInput();
-        controls.Gameplay.Jump.canceled += ctx => JumpCutDoubleJump();
-
-        controls.Gameplay.Enable();
-
         RB = GetComponent<Rigidbody2D>();
+    }
+
+    public void JumpInputAction(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started)
+        {
+            OnJumpInput();
+            CheckDoubleJump();
+        }
+
+        if (context.phase == InputActionPhase.Canceled)
+        {
+            OnJumpUpInput();
+            JumpCutDoubleJump();
+        }
     }
 
     private void Update()
@@ -84,12 +89,6 @@ public class PlayerJump : MonoBehaviour
             _isJumpCut = false; // Reset jump cut when new jump
             Jump(); // Do jump
         }
-
-        // jump cut if jump released while ascending from double jump
-        //if (PlayerControls.GetJumpReleased() && isDoubleJumping && RB.velocity.y > 0)
-        //{
-        //    _isJumpCut = true;
-        //}
 
         ApplyGravity();
     }

@@ -17,6 +17,7 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         totalPossibleScore = GameObject.FindGameObjectsWithTag("ScoreAdder").Length;
+        totalPossibleScore += GameObject.FindGameObjectsWithTag("Enemy").Length;
         UpdateScoreUI();
     }
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public delegate bool ThrowInputFunction();
 
@@ -61,27 +62,24 @@ public class ThrowRing : MonoBehaviour
     private bool canThrow = true;
 
     private PlayerFacing pf;
-    private List<ThrowableRing> ThrowableRingList = new();
-
-    private Controls controls;
+    private List<ThrowableRing> ThrowableRingList;
 
     private void Awake()
     {
-        controls = new Controls();
-        controls.Gameplay.AttackLeft.started += ctx => ThrowLeftRing();
-        controls.Gameplay.AttackRight.started += ctx => ThrowRightRing();
-        controls.Gameplay.Attack.started += ctx => ThrowBothRings();
-
-        controls.Gameplay.Enable();
-
         pf = GetComponent<PlayerFacing>();
 
-        ThrowableRingList.Add(new ThrowableRing("Left Ring", LeftRingObj));
-        ThrowableRingList.Add(new ThrowableRing("Right Ring", RightRingObj));
+        ThrowableRingList = new()
+        {
+            new ThrowableRing("Left Ring", LeftRingObj),
+            new ThrowableRing("Right Ring", RightRingObj)
+        };
     }
 
-    private void ThrowLeftRing()
+    public void ThrowLeftRing(InputAction.CallbackContext context)
     {
+        if (context.phase != InputActionPhase.Started)
+            return;
+
         ThrowableRing tr = ThrowableRingList[0];
         if (tr.CheckRingThrow())
         {
@@ -89,8 +87,11 @@ public class ThrowRing : MonoBehaviour
         }
     }
 
-    private void ThrowRightRing()
+    public void ThrowRightRing(InputAction.CallbackContext context)
     {
+        if (context.phase != InputActionPhase.Started)
+            return;
+
         ThrowableRing tr = ThrowableRingList[1];
         if (tr.CheckRingThrow())
         {
@@ -98,8 +99,11 @@ public class ThrowRing : MonoBehaviour
         }
     }
 
-    private void ThrowBothRings()
+    public void ThrowBothRings(InputAction.CallbackContext context)
     {
+        if (context.phase != InputActionPhase.Started)
+            return;
+
         foreach (ThrowableRing throwableRing in ThrowableRingList)
         {
             if (throwableRing.CheckRingThrow())
@@ -108,13 +112,6 @@ public class ThrowRing : MonoBehaviour
                 return;
             }
         }
-    }
-
-    private IEnumerator WaitThrowCooldown()
-    {
-        canThrow = false;
-        yield return new WaitForSecondsRealtime(ringThrowCooldown);
-        canThrow = true;
     }
 
     private void OnDrawGizmosSelected()
@@ -127,12 +124,15 @@ public class ThrowRing : MonoBehaviour
 
     private void Throw(ThrowableRing tr)
     {
-        if (!canThrow)
+        if (canThrow)
+        {
+            canThrow = false;
+            Utility.InvokeLambda(() => { canThrow = true; }, ringThrowCooldown);
+        }
+        else
         {
             return;
         }
-
-        StartCoroutine(WaitThrowCooldown());
 
         Vector2 throwdir = transform.position;
         Vector3 ringAngle = Vector3.zero;

@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 8922483658604877670}
   m_Layer: 0
   m_Name: enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c47a8344949654ea2049f0e3af757c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
+  health: 5
 --- !u!114 &1593841820988193875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathEffectObject: {fileID: 3180648940936207353, guid: de91f24ada105694280c305d396d3e87, type: 3}
+  onDeathDrop: {fileID: 6896730597442073637, guid: dd23019e826ca5b4186da3a30743676b, type: 3}
 --- !u!1 &1681352778144202199
 GameObject:
   m_ObjectHideFlags: 0

@@ -33,14 +33,17 @@ public class PlayerGetHit : MonoBehaviour
 
     public void ApplyHit(int damage, Vector2 hitPosition, bool withKnockback=true)
     {
-        health.TakeDamage(damage);
-
-        if (withKnockback)
+        if (health.currentHealth > 1)
         {
-            knockback.DoKnockback(knockbackForce, stunDuration, hitPosition);
+            if (withKnockback)
+            {
+                knockback.DoKnockback(knockbackForce, stunDuration, hitPosition);
+            }
+
+            StartCoroutine(ApplyIFrames(invincibilityDuration));
         }
-        
-        StartCoroutine(ApplyIFrames(invincibilityDuration));
+
+        health.TakeDamage(damage);
     }
 
     private IEnumerator ApplyIFrames(float duration)
