@@ -34,7 +34,6 @@ public class PlayerAnimControl : MonoBehaviour
         }   
         else
         {
-            print(RB.velocity.y);
             if (RB.velocity.y > 0.5)
             {
                 anim.SetInteger("isFlying", 1);
