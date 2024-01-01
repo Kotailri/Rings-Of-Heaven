@@ -49,7 +49,7 @@ public class PlayerGetHit : MonoBehaviour
     private IEnumerator ApplyIFrames(float duration)
     {
         canGetHit = false;
-        playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0.5f);
+        playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0.2f);
 
         yield return new WaitForSeconds(duration);
 

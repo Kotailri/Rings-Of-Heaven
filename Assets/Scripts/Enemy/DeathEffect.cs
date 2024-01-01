@@ -11,6 +11,5 @@ public class DeathEffect : MonoBehaviour
     {
         Instantiate(deathEffectObject, transform.position, Quaternion.identity);
         Instantiate(onDeathDrop, transform.position, Quaternion.identity);
-        Destroy(gameObject);
     }
 }

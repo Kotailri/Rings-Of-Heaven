@@ -11,11 +11,12 @@ public class EnemyTakeDamage : MonoBehaviour
 
     private Rigidbody2D RB;
 
-    private List<int> ringIds = new();
+    private List<int> ringIds;
 
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
+        ringIds = new();
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -32,16 +33,6 @@ public class EnemyTakeDamage : MonoBehaviour
                 GetComponent<Animator>().SetTrigger("hit");
                 damageParticles.Play();
             }
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        // Ring is no longer trying to damage, remove ring damage instance
-
-        if (ringIds.Contains(collision.gameObject.GetInstanceID()))
-        {
-            ringIds.Remove(collision.gameObject.GetInstanceID());
         }
     }
 

@@ -30,6 +30,11 @@ public class EnemyHealth : MonoBehaviour
 
     public void RemoveHealth(int _hp)
     {
+        if (_hp <= 0)
+        {
+            return;
+        }
+
         currentHealth -= _hp;
         
         BalanceHealth();
@@ -51,17 +56,13 @@ public class EnemyHealth : MonoBehaviour
 
     private void CheckDeath()
     {
-        if (currentHealth <= 0) 
+        if (currentHealth == 0) 
         {
             if (TryGetComponent(out DeathEffect death))
             {
-                if (death != null)
-                {
-                    death.DoDeathEffect();
-                    return;
-                }
+                death.DoDeathEffect();
             }
-            
+
             Destroy(gameObject);
         }
     }

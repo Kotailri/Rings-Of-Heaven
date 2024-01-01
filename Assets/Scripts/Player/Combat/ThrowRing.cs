@@ -136,7 +136,7 @@ public class ThrowRing : MonoBehaviour
 
         Vector2 throwdir = transform.position;
         Vector3 ringAngle = Vector3.zero;
-        float rangeHorizontal = 2.0f;
+        float rangeHorizontal = 1.0f;
         float rangeVertical = 2.0f;
 
         switch (pf.GetFacingDirection())

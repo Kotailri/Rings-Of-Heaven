@@ -95,7 +95,6 @@ public class PlayerMovement : MonoBehaviour
         // Change the facing direction when new movement direction is different from current
         if (moveInput.x != 0)
         {
-            animator.SetBool("isWalking", true);
             if (moveInput.x > 0)
             {
                 CheckDirectionToFace(true);
@@ -106,10 +105,11 @@ public class PlayerMovement : MonoBehaviour
                 CheckDirectionToFace(false);
             }
         }
-        else
-        {
-            animator.SetBool("isWalking", false);
-        }
+    }
+
+    public float GetMoveInputX()
+    {
+        return moveInput.x;
     }
 
     private void FixedUpdate()
