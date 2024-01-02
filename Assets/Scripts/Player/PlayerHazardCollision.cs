@@ -35,6 +35,9 @@ public class PlayerHazardCollision : MonoBehaviour
 
     private void RespawnPlayer(Transform other)
     {
+        pm.ReleaseInputs();
+        GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+
         if (GetComponent<PlayerHealth>().currentHealth > 1)
         {
             transform.position = currentCheckpoint;
@@ -43,7 +46,7 @@ public class PlayerHazardCollision : MonoBehaviour
             
             StartCoroutine(EnableMovement());
         }
-
+        
         hit.ApplyHit(1, other.position, false);
 
     }

@@ -40,6 +40,11 @@ public class PlayerFacing : MonoBehaviour
         return facingDirection;
     }
 
+    public PlayerRBFacingDirection GetFacingDirectionRB()
+    {
+        return pm.facing;
+    }
+
     private void CheckKeyboard(float input)
     {
         if (input == 1)

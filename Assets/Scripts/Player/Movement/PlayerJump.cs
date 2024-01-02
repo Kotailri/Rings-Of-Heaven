@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -29,16 +26,10 @@ public class PlayerJump : MonoBehaviour
     [Range(0.01f, 0.5f)] public float jumpInputBufferTime; //Grace period after pressing jump, where you have still pressed jump
 
     [Space(15)]
-    [Header("Checks")]
-    [SerializeField] private Transform _groundCheckPoint;
-    [SerializeField] private Vector2 _groundCheckSize = new(0.49f, 0.03f);
-    [SerializeField] private LayerMask _groundLayer;
-    [HideInInspector] public bool isGrounded;
-
-    [Space(15)]
     public ParticleSystem dustParticles;
 
     private Rigidbody2D RB;
+    private PlayerGrounded grounded;
     private bool canMove = true;
 
     // Timers
@@ -48,6 +39,7 @@ public class PlayerJump : MonoBehaviour
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
+        grounded = GetComponent<PlayerGrounded>();
     }
 
     public void JumpInputAction(InputAction.CallbackContext context)
@@ -112,21 +104,12 @@ public class PlayerJump : MonoBehaviour
         if (!isJumping)
         {
             // If touching ground
-            if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
+            if (grounded.isGrounded)
             {
                 // Reset grounded time, with coyote time tolerance
                 lastOnGroundTime = coyoteTime;
                 isDoubleJumping = false;
             }
-        }
-
-        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
-        {
-            isGrounded = true;
-        }
-        else
-        {
-            isGrounded = false;
         }
     }
 
@@ -146,6 +129,7 @@ public class PlayerJump : MonoBehaviour
             RB.velocity = new Vector2(RB.velocity.x, 0); // Zero the fall speed
 
             RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Apply Jump
+            GetComponent<PlayerDash>().airDashReady = true;
             dustParticles.Play();
         }
     }
@@ -207,11 +191,5 @@ public class PlayerJump : MonoBehaviour
     {
         // Can jump cut only when ascending 
         return isJumping && RB.velocity.y > 0;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(_groundCheckPoint.position, _groundCheckSize);
     }
 }

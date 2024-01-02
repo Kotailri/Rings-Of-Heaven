@@ -19,11 +19,12 @@ public class PlayerMovement : MonoBehaviour
     public ParticleSystem dustParticles;
 
     private Rigidbody2D RB;
+    private PlayerGrounded grounded;
+    private PlayerJump pj;
+
     [HideInInspector]
     public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
     private Vector2 moveInput;
-
-    private PlayerJump pj;
 
     [Header("TEMP DEBUG")]
     public bool OnIce;
@@ -57,12 +58,25 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
+        grounded = GetComponent<PlayerGrounded>();
+    }
+
+    private void Start()
+    {
+        ReleaseInputs();
+        RB.velocity = Vector2.zero;
     }
 
     public void ToggleMovement(bool _canMove)
     {
         canMove = _canMove;
         pj.ToggleMovement(_canMove);
+    }
+
+    public void ReleaseInputs()
+    {
+        moveInput = Vector2.zero;
+        RB.velocity = Vector2.zero;
     }
 
     private void Update()
@@ -201,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(rotator);
 
-        if (pj.isGrounded)
+        if (grounded.isGrounded)
         {
             dustParticles.Play();
         }

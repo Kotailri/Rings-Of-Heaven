@@ -8,7 +8,7 @@ public class PlayerAnimControl : MonoBehaviour
 
     private Rigidbody2D RB;
     private PlayerMovement pm;
-    private PlayerJump jump;
+    private PlayerGrounded grounded;
 
     private void Awake()
     {
@@ -16,13 +16,15 @@ public class PlayerAnimControl : MonoBehaviour
         anim = GetComponent<Animator>();
 
         pm = GetComponent<PlayerMovement>();
-        jump = GetComponent<PlayerJump>();
+        grounded = GetComponent<PlayerGrounded>();
     }
 
     private void Update()
     {
-        if (jump.isGrounded)
+        if (grounded.isGrounded)
         {
+            anim.SetInteger("isFlying", 0);
+
             if (Mathf.Abs(pm.GetMoveInputX()) > 0)
             {
                 anim.SetBool("isWalking", true);

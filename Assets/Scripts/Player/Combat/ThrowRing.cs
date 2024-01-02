@@ -172,6 +172,8 @@ public class ThrowRing : MonoBehaviour
                 break;
         }
 
+        GetComponent<Animator>().SetTrigger("attack");
+
         tr.RingReference = Instantiate(tr.RingObject, throwdir, Quaternion.Euler(ringAngle));
         tr.RingReference.GetComponent<Ring>().SendRing(pf.GetFacingDirection());
     }

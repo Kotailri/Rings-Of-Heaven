@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Igloo_M_L_0001
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: eb06584eb15894c4fa6cd0401717063a, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7783019, g: 0.88355243, b: 1, a: 0.9137255}
   m_Transform:
     e00: 1
     e01: 0
