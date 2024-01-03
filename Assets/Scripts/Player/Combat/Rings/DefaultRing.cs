@@ -66,7 +66,7 @@ public class DefaultRing : Ring, IRingCatchable, IRingReturn
     public void Return()
     {
         returning = true;
-        targetPosition = (Vector2) player.transform.position;
+        targetPosition = (Vector2) player.transform.position - new Vector2(0,2f);
     }
 
     private new void OnTriggerStay2D(Collider2D collision)

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -134,7 +132,7 @@ public class ThrowRing : MonoBehaviour
             return;
         }
 
-        Vector2 throwdir = transform.position;
+        Vector2 throwdir = Vector2.zero;
         Vector3 ringAngle = Vector3.zero;
         float rangeHorizontal = 1.0f;
         float rangeVertical = 2.0f;
@@ -160,7 +158,7 @@ public class ThrowRing : MonoBehaviour
                     return;
 
                 ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, 90);
-                throwdir += new Vector2(0, rangeVertical);
+                throwdir += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, rangeVertical);
                 break;
 
             case PlayerFacingDirection.Down:
@@ -168,13 +166,17 @@ public class ThrowRing : MonoBehaviour
                     return;
 
                 ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, -90);
-                throwdir += new Vector2(0, -rangeVertical);
+                throwdir += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, -rangeVertical);
                 break;
         }
 
         GetComponent<Animator>().SetTrigger("attack");
 
-        tr.RingReference = Instantiate(tr.RingObject, throwdir, Quaternion.Euler(ringAngle));
-        tr.RingReference.GetComponent<Ring>().SendRing(pf.GetFacingDirection());
+        Utility.InvokeLambda(() =>
+        {
+            tr.RingReference = Instantiate(tr.RingObject, (Vector2)transform.position + throwdir - new Vector2(0, 1f), Quaternion.Euler(ringAngle));
+            tr.RingReference.GetComponent<Ring>().SendRing(pf.GetFacingDirection());
+        }, 0.25f);
+        
     }
 }
