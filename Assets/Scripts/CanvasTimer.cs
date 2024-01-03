@@ -30,7 +30,7 @@ public class CanvasTimer : MonoBehaviour
 
     public int GetTime()
     {
-        return Mathf.FloorToInt((timer * 1000) % 1000);
+        return Mathf.FloorToInt(timer*1000);
     }
 
     public string FormatTime(int milliseconds)

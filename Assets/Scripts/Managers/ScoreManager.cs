@@ -30,15 +30,22 @@ public class ScoreManager : MonoBehaviour
             bestScoreText.text = GetHighScore().ToString();
         }
 
-        if (GetBestTime() != int.MaxValue)
+        if (GetBestTime() != 0)
         {
-            bestTimeText.text = Global.timer.FormatTime(Global.timer.GetTime());
+            bestTimeText.text = Global.timer.FormatTime(GetBestTime());
         }
     }
 
     public void AddScore(int score)
     {
         currentScore += score;
+        UpdateScoreUI();
+    }
+    
+
+    public void ResetScore()
+    {
+        currentScore = 0;
         UpdateScoreUI();
     }
 
@@ -65,10 +72,9 @@ public class ScoreManager : MonoBehaviour
 
     public void SaveBestTime()
     {
-        int currentBestTime = PlayerPrefs.GetInt(BEST_TIME_KEY, int.MaxValue);
+        int currentBestTime = PlayerPrefs.GetInt(BEST_TIME_KEY, 0);
         int time = Global.timer.GetTime();
-
-        if (time < currentBestTime)
+        if (time < currentBestTime || currentBestTime == 0)
         {
             PlayerPrefs.SetInt(BEST_TIME_KEY, time);
             PlayerPrefs.Save();
@@ -84,6 +90,6 @@ public class ScoreManager : MonoBehaviour
 
     public int GetBestTime()
     {
-        return PlayerPrefs.GetInt(BEST_TIME_KEY, int.MaxValue);
+        return PlayerPrefs.GetInt(BEST_TIME_KEY, 0);
     }
 }

@@ -14,11 +14,30 @@ public class PlayerGrounded : MonoBehaviour
 
     private void Update()
     {
-        isGrounded = 
-               Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer)
-            || Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _iceLayer);
+        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer) 
+            || Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _iceLayer))
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
 
-        isIcy = Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _iceLayer);
+        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer))
+        {
+            isIcy = false;
+        }
+
+        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _iceLayer))
+        {
+            isIcy = true;
+        }
+
+        if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) < 0.1f)
+        {
+            isIcy = false;
+        }
     }
 
     private void OnDrawGizmosSelected()

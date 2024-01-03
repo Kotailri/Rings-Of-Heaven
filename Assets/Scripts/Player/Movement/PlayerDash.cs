@@ -100,6 +100,7 @@ public class PlayerDash : MonoBehaviour
         DashParticle.Play();
         Instantiate(afterImage, transform.position, rotation);
 
+        RB.velocity = Vector2.zero;
         pm.ToggleMovement(true);
         isDashing = false;
         RB.constraints = RigidbodyConstraints2D.FreezeRotation;
