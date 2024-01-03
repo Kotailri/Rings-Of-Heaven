@@ -7,7 +7,7 @@ public class PlayerGetHit : MonoBehaviour
     private bool canGetHit = true;
 
     private float stunDuration = 0.25f;
-    private float knockbackForce = 100.0f;
+    private float knockbackForce = 10.0f;
     private float invincibilityDuration = 1.0f;
 
     private PlayerHealth health;
@@ -49,11 +49,11 @@ public class PlayerGetHit : MonoBehaviour
     private IEnumerator ApplyIFrames(float duration)
     {
         canGetHit = false;
-        playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0.2f);
+        playerSprite.color = new Color(1, 0, 0, 0.5f);
 
         yield return new WaitForSeconds(duration);
 
         canGetHit = true;
-        playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 1);
+        playerSprite.color = new Color(1, 1, 1, 1);
     }
 }

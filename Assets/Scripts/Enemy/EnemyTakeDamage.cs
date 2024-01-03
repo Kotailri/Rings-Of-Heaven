@@ -49,7 +49,8 @@ public class EnemyTakeDamage : MonoBehaviour
             RB.velocity = Vector2.zero;
         }
 
-        RB.AddForce(knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
+        if (knockbackMultiplier > 0)
+            RB.AddForce(knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
     }
 
     private bool CheckIfCanDamage(GameObject ring)

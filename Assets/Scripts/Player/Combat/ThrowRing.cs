@@ -137,6 +137,8 @@ public class ThrowRing : MonoBehaviour
         float rangeHorizontal = 1.0f;
         float rangeVertical = 2.0f;
 
+
+
         switch (pf.GetFacingDirection())
         {
             case PlayerFacingDirection.Left:
@@ -170,13 +172,15 @@ public class ThrowRing : MonoBehaviour
                 break;
         }
 
+        PlayerFacingDirection savedThrowDirection = pf.GetFacingDirection();
+
         GetComponent<Animator>().SetTrigger("attack");
 
         Utility.InvokeLambda(() =>
         {
             tr.RingReference = Instantiate(tr.RingObject, (Vector2)transform.position + throwdir - new Vector2(0, 1f), Quaternion.Euler(ringAngle));
-            tr.RingReference.GetComponent<Ring>().SendRing(pf.GetFacingDirection());
-        }, 0.25f);
+            tr.RingReference.GetComponent<Ring>().SendRing(savedThrowDirection);
+        }, 0.1f);
         
     }
 }

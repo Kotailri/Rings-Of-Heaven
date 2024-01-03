@@ -38,7 +38,7 @@ public class PlayerDash : MonoBehaviour
 
     public void Dash(InputAction.CallbackContext context)
     {
-        if (PlayerUnlocks.isDashUnlocked 
+        if (PlayerUnlocks.isDashUnlocked
             && currentDashCooldown <= 0
             && isDashing == false
             && context.phase == InputActionPhase.Started)

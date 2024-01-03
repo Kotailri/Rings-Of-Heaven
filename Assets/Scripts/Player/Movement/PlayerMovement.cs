@@ -32,7 +32,8 @@ public class PlayerMovement : MonoBehaviour
     public float slipperyness;
     public float iceSpeedMultiplier;
 
-    private bool canMove = true;
+    [HideInInspector]
+    public bool canMove = true;
 
     private Controls controls;
     private float axisInputX;
@@ -86,20 +87,13 @@ public class PlayerMovement : MonoBehaviour
 
         float keyboardInputX = keyboardRight - keyboardLeft;
 
-        if (canMove)
+        if (controllerInputX != 0)
         {
-            if (controllerInputX != 0)
-            {
-                moveInput.x = controllerInputX;
-            }
-            else
-            {
-                moveInput.x = keyboardInputX;
-            }
+            moveInput.x = controllerInputX;
         }
         else
         {
-            moveInput.x = 0;
+            moveInput.x = keyboardInputX;
         }
 
         // Change the facing direction when new movement direction is different from current
@@ -132,6 +126,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
+        if (!canMove) return;
+
         //Calculate the direction we want to move in and our desired velocity
         float targetSpeed = moveInput.x * runMaxSpeed;
 
