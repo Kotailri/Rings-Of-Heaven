@@ -10,7 +10,7 @@ public enum PlayerRBFacingDirection
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Run")]
+    [Header("Movement")]
     public float runMaxSpeed; //Target speed we want the player to reach.
     public float runAccelAmount; //The actual force (multiplied with speedDiff) applied to the player.
     public float runDeccelAmount; //Actual force (multiplied with speedDiff) applied to the player .
@@ -26,7 +26,8 @@ public class PlayerMovement : MonoBehaviour
     public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
     private Vector2 moveInput;
 
-    [Header("TEMP DEBUG")]
+    [Space(15)]
+    [Header("Ice Movement")]
     public bool OnIce;
     public float slipperyness;
     public float iceSpeedMultiplier;
@@ -34,13 +35,9 @@ public class PlayerMovement : MonoBehaviour
     private bool canMove = true;
 
     private Controls controls;
-
     private float axisInputX;
-
     private float keyboardLeft;
     private float keyboardRight;
-
-    private Animator animator;
 
     private void Awake()
     {
@@ -55,7 +52,6 @@ public class PlayerMovement : MonoBehaviour
 
         controls.Gameplay.Enable();
 
-        animator = GetComponent<Animator>();
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
         grounded = GetComponent<PlayerGrounded>();
@@ -128,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (OnIce)
+        if (grounded.isIcy)
             RunOnIce();
         else
             Run();

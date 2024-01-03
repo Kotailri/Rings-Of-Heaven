@@ -28,6 +28,21 @@ public class CanvasTimer : MonoBehaviour
         }
     }
 
+    public int GetTime()
+    {
+        return Mathf.FloorToInt((timer * 1000) % 1000);
+    }
+
+    public string FormatTime(int milliseconds)
+    {
+        int totalSeconds = milliseconds / 1000;
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        int remainingMilliseconds = milliseconds % 1000;
+
+        return string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, remainingMilliseconds);
+    }
+
     private void UpdateTimerDisplay()
     {
         int minutes = Mathf.FloorToInt(timer / 60);

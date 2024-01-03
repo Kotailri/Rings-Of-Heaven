@@ -16,23 +16,44 @@ public class TimerStarter : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            if (activated)
-                return;
-
-            activated = true;
-
             switch (startOrEnd)
             {
                 case StartEnd.Start:
-                    GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 0.1f);
-                    Global.timer.PauseTimer(false);
+                    if (!activated)
+                        StartGame();
                     break;
+
                 case StartEnd.End:
-                    GetComponent<SpriteRenderer>().color = new Color(0, 1, 0, 0.1f);
-                    Global.timer.PauseTimer(true);
+                    if (activated)
+                        EndGame();
                     break;
             }
             
         }
+    }
+
+    private void Start()
+    {
+        // load best score and time
+        // update board
+    }
+
+    private void StartGame()
+    {
+        GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 0.1f);
+        Global.timer.ResetTimer();
+        Global.timer.PauseTimer(false);
+        activated = true;
+    }
+
+    private void EndGame()
+    {
+        GetComponent<SpriteRenderer>().color = new Color(0, 1, 0, 0.1f);
+        Global.timer.PauseTimer(true);
+        activated = false;
+
+        Managers.scoreManager.SaveBestTime();
+        Managers.scoreManager.SaveHighScore();
+        // update board
     }
 }

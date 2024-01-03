@@ -15,9 +15,6 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
     public float patrolSpeed;
 
     [Space(10)]
-    public bool StayOnPlatform;
-
-    [Space(10)]
     [Header("Ledge Detection")]
     public Transform ledgeDetectLeft;
     public Transform ledgeDetectRight;
@@ -150,7 +147,6 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
 
     public void GetStunned()
     {
-        if (StayOnPlatform) { return; }
 
         if (canMove)
         {
@@ -159,7 +155,7 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
             Utility.InvokeLambda(() =>
             {
                 RecoverMovement();
-            }, 0.25f);
+            }, 0.1f);
         }
         
     }
@@ -171,6 +167,7 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
 
         if (!canMove)
         {
+            RB.velocity = Vector2.zero;
             canMove = true;
             SetDirection(currentDirection);
         }
