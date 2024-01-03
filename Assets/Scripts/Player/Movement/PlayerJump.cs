@@ -131,6 +131,7 @@ public class PlayerJump : MonoBehaviour
             RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Apply Jump
             GetComponent<PlayerDash>().airDashReady = true;
             dustParticles.Play();
+            AudioManager.instance.PlaySound("fluff");
         }
     }
 
@@ -179,6 +180,8 @@ public class PlayerJump : MonoBehaviour
         // Apply jump force
         RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         dustParticles.Play();
+
+        AudioManager.instance.PlaySound("fluff");
     }
 
     private bool CanJump()

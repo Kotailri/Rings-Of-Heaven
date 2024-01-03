@@ -10,6 +10,7 @@ public class PlayerScoreCollision : MonoBehaviour
         {
             Destroy(collision.gameObject);
             Managers.scoreManager.AddScore(1);
+            AudioManager.instance.PlaySound("blip");
         }
     }
 }

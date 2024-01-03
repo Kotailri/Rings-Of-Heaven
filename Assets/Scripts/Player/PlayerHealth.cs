@@ -35,6 +35,10 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
+        if (damageAmount > 0)
+        {
+            AudioManager.instance.PlaySound("damaged");
+        }
 
         Global.vignetteTween.SetVignetteDamage();
 

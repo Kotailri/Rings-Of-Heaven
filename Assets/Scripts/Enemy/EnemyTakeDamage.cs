@@ -68,6 +68,8 @@ public class EnemyTakeDamage : MonoBehaviour
 
     private void ApplyDamage(Ring ring)
     {
+        AudioManager.instance.PlaySound("punch");
+
         // Apply damage to enemy health
         int damageTaken = ring.GetRingDamage();
         if (TryGetComponent(out EnemyHealth health) && damageTaken > 0)

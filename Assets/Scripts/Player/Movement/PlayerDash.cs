@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -81,6 +79,8 @@ public class PlayerDash : MonoBehaviour
 
     private IEnumerator DashCoroutine()
     {
+        AudioManager.instance.PlaySound("dash");
+
         Quaternion rotation = Quaternion.identity;
         if (GetComponent<PlayerFacing>().GetFacingDirectionRB() == PlayerRBFacingDirection.Left )
         {

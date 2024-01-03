@@ -108,6 +108,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 CheckDirectionToFace(false);
             }
+
         }
     }
 
