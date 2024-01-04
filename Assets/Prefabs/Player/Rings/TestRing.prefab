@@ -66,8 +66,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: -0.006000042, y: -0.016849995, z: 0}
-    m_Extent: {x: 1.2572, y: 1.16685, z: 0}
+    m_Center: {x: -0.0062000155, y: -0.016449988, z: 0}
+    m_Extent: {x: 1.2581, y: 1.16715, z: 0}
   m_PointLightInnerAngle: 150
   m_PointLightOuterAngle: 210
   m_PointLightInnerRadius: 1
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 1070236224050669584}
   m_Layer: 0
   m_Name: TestRing
-  m_TagString: Untagged
+  m_TagString: Ring
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -170,7 +170,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 454926181, guid: b367026a29b3bbe429a057052bb65d03, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.91119623, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

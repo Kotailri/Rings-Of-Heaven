@@ -10,6 +10,7 @@ TagManager:
   - ScoreAdder
   - Enemy
   - Heal
+  - Ring
   layers:
   - Default
   - TransparentFX
