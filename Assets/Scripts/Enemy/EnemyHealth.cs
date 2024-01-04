@@ -63,7 +63,7 @@ public class EnemyHealth : MonoBehaviour
                 death.DoDeathEffect();
             }
 
-            Destroy(gameObject);
+            transform.position = Config.poolPosition;
         }
     }
 }

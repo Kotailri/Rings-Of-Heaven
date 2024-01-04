@@ -19,7 +19,6 @@ public class PlayerHealth : MonoBehaviour
     public void SetMaxHealth(int newMaxHealth)
     {
         maxHealth = newMaxHealth;
-        currentHealth = maxHealth;
         UpdateHealthUI();
     }
 

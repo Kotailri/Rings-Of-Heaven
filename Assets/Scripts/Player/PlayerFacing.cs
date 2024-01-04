@@ -20,15 +20,37 @@ public class PlayerFacing : MonoBehaviour
     private void Awake()
     {
         controls = new Controls();
-        controls.Gameplay.MoveY.performed += ctx => axisInputY = ctx.ReadValue<float>();
 
-        controls.Gameplay.KeyboardUp.performed += ctx => KeyboardUp = ctx.ReadValue<float>();
-        controls.Gameplay.KeyboardUp.canceled += ctx => KeyboardUp = 0;
+        switch (Config.controlConfig)
+        {
+            case ControlConfig.Arrows:
+                controls.Gameplay.MoveY.performed += ctx => axisInputY = ctx.ReadValue<float>();
 
-        controls.Gameplay.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
-        controls.Gameplay.KeyboardDown.canceled += ctx => KeyboardDown = 0;
+                controls.Gameplay.KeyboardUp.performed += ctx => KeyboardUp = ctx.ReadValue<float>();
+                controls.Gameplay.KeyboardUp.canceled += ctx => KeyboardUp = 0;
 
-        controls.Gameplay.Enable();
+                controls.Gameplay.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
+                controls.Gameplay.KeyboardDown.canceled += ctx => KeyboardDown = 0;
+
+                controls.Gameplay.Enable();
+                controls.GameplayWASD.Disable();
+
+                break;
+
+            case ControlConfig.WASD:
+                controls.GameplayWASD.MoveY.performed += ctx => axisInputY = ctx.ReadValue<float>();
+
+                controls.GameplayWASD.KeyboardUp.performed += ctx => KeyboardUp = ctx.ReadValue<float>();
+                controls.GameplayWASD.KeyboardUp.canceled += ctx => KeyboardUp = 0;
+
+                controls.GameplayWASD.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
+                controls.GameplayWASD.KeyboardDown.canceled += ctx => KeyboardDown = 0;
+
+                controls.GameplayWASD.Enable();
+                controls.Gameplay.Disable();
+                break;
+        }
+        
         pm = GetComponent<PlayerMovement>();
     }
 

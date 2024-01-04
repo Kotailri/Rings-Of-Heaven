@@ -8,9 +8,10 @@ public class PlayerScoreCollision : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("ScoreAdder"))
         {
-            Destroy(collision.gameObject);
             Managers.scoreManager.AddScore(1);
             AudioManager.instance.PlaySound("blip");
+
+            collision.gameObject.transform.position = Config.poolPosition;
         }
     }
 }

@@ -178,7 +178,7 @@ public class ThrowRing : MonoBehaviour
 
         Utility.InvokeLambda(() =>
         {
-            tr.RingReference = Instantiate(tr.RingObject, (Vector2)transform.position + throwdir - new Vector2(0, 1f), Quaternion.Euler(ringAngle));
+            tr.RingReference = Instantiate(tr.RingObject, (Vector2)transform.position + throwdir - new Vector2(0, 0.5f), Quaternion.Euler(ringAngle));
             tr.RingReference.GetComponent<Ring>().SendRing(savedThrowDirection);
             AudioManager.instance.PlaySound("throw");
         }, 0.1f);

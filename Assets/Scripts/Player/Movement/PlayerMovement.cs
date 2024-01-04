@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum PlayerRBFacingDirection
 {
@@ -41,15 +42,36 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         controls = new Controls();
-        controls.Gameplay.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
 
-        controls.Gameplay.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
-        controls.Gameplay.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
+        switch (Config.controlConfig)
+        {
+            case ControlConfig.Arrows:
+                controls.Gameplay.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
 
-        controls.Gameplay.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
-        controls.Gameplay.KeyboardRight.canceled += ctx => keyboardRight = 0;
+                controls.Gameplay.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
+                controls.Gameplay.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
 
-        controls.Gameplay.Enable();
+                controls.Gameplay.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
+                controls.Gameplay.KeyboardRight.canceled += ctx => keyboardRight = 0;
+
+                controls.Gameplay.Enable();
+                controls.GameplayWASD.Disable();
+                break;
+
+            case ControlConfig.WASD:
+                controls.GameplayWASD.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
+
+                controls.GameplayWASD.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
+                controls.GameplayWASD.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
+
+                controls.GameplayWASD.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
+                controls.GameplayWASD.KeyboardRight.canceled += ctx => keyboardRight = 0;
+
+                controls.GameplayWASD.Enable();
+                controls.Gameplay.Disable();
+                break;
+        }
+        
 
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
@@ -71,7 +93,6 @@ public class PlayerMovement : MonoBehaviour
     public void ReleaseInputs()
     {
         moveInput = Vector2.zero;
-        RB.velocity = Vector2.zero;
     }
 
     private void Update()

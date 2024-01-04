@@ -8,7 +8,7 @@ public class PlayerGetHit : MonoBehaviour
 
     private float stunDuration = 0.25f;
     private float knockbackForce = 10.0f;
-    private float invincibilityDuration = 1.0f;
+    private float invincibilityDuration = 1.5f;
 
     private PlayerHealth health;
     private PlayerKnockback knockback;
@@ -33,6 +33,9 @@ public class PlayerGetHit : MonoBehaviour
 
     public void ApplyHit(int damage, Vector2 hitPosition, bool withKnockback=true)
     {
+        if (canGetHit == false)
+            return;
+
         if (health.currentHealth > 1)
         {
             if (withKnockback)

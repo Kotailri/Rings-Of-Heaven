@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -12,6 +11,9 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI bestScoreText;
     public TextMeshProUGUI bestTimeText;
 
+    [Space(5f)]
+    public TextMeshProUGUI enemiesKilledText;
+
     private int totalPossibleScore = 0;
 
     private void Awake()
@@ -22,7 +24,6 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         totalPossibleScore = GameObject.FindGameObjectsWithTag("ScoreAdder").Length;
-        totalPossibleScore += GameObject.FindGameObjectsWithTag("Enemy").Length;
         UpdateScoreUI();
 
         if (GetHighScore() != 0)
@@ -34,6 +35,9 @@ public class ScoreManager : MonoBehaviour
         {
             bestTimeText.text = Global.timer.FormatTime(GetBestTime());
         }
+
+        totalEnemies = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        UpdateEnemyKilledUI();
     }
 
     public void AddScore(int score)
@@ -51,7 +55,7 @@ public class ScoreManager : MonoBehaviour
 
     private void UpdateScoreUI()
     {
-        scoreText.text = "Score: " + currentScore + " / " + totalPossibleScore;
+        scoreText.text = "Coins: " + currentScore + " / " + totalPossibleScore;
     }
 
     // SAVE LOAD SCORE
@@ -91,5 +95,26 @@ public class ScoreManager : MonoBehaviour
     public int GetBestTime()
     {
         return PlayerPrefs.GetInt(BEST_TIME_KEY, 0);
+    }
+
+    // ENEMIES KILLED
+    private int enemiesKilled = 0;
+    private int totalEnemies = 0;
+
+    public void ResetEnemiesKilled()
+    {
+        enemiesKilled = 0;
+        UpdateEnemyKilledUI();
+    }
+
+    public void OnEnemyKilled()
+    {
+        enemiesKilled++;
+        UpdateEnemyKilledUI();
+    }
+
+    private void UpdateEnemyKilledUI()
+    {
+        enemiesKilledText.text = "Enemies Killed: " + enemiesKilled + " / " + totalEnemies;
     }
 }

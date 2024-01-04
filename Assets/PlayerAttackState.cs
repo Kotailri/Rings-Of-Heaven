@@ -10,20 +10,21 @@ public class PlayerAttackState : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player.GetComponent<PlayerGrounded>().isGrounded)
+        if (player.GetComponent<PlayerGrounded>().isGrounded && !player.GetComponent<PlayerGrounded>().isIcy)
         {
             player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-            player.GetComponent<PlayerMovement>().ToggleMovement(false);
         }
         
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    /*override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-    }*/
+        player.GetComponent<PlayerMovement>().ToggleMovement(false);
+        player.GetComponent<PlayerMovement>().ReleaseInputs();
+        //player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

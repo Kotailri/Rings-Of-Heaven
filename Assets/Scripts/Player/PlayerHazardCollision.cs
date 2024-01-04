@@ -41,6 +41,7 @@ public class PlayerHazardCollision : MonoBehaviour
         if (GetComponent<PlayerHealth>().currentHealth > 1)
         {
             transform.position = currentCheckpoint;
+            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
             pm.ToggleMovement(false);
             
