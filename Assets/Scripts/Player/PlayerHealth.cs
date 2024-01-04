@@ -22,6 +22,11 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
+    public void ResetHp()
+    {
+        currentHealth = 3;
+    }
+
     // Add to the player's maximum health
     public void AddMaxhealth(int newMaxHealthAdd)
     {

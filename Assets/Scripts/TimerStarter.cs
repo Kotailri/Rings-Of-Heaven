@@ -76,7 +76,10 @@ public class TimerStarter : MonoBehaviour
     {
         Global.timer.ResetTimer();
         Global.timer.PauseTimer(false);
+
         Managers.scoreManager.ResetScore();
+        Managers.scoreManager.ResetEnemiesKilled();
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().ResetHp();
         AudioManager.instance.PlaySound("blip");
 
         LoadObjects();

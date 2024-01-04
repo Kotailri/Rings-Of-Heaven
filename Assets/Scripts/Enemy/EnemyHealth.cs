@@ -64,6 +64,7 @@ public class EnemyHealth : MonoBehaviour
             }
             Managers.scoreManager.OnEnemyKilled();
             transform.position = Config.poolPosition;
+            currentHealth = health;
         }
     }
 }
