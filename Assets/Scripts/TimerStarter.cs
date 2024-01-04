@@ -77,6 +77,7 @@ public class TimerStarter : MonoBehaviour
         Global.timer.ResetTimer();
         Global.timer.PauseTimer(false);
         Managers.scoreManager.ResetScore();
+        AudioManager.instance.PlaySound("blip");
 
         LoadObjects();
     }
@@ -87,6 +88,7 @@ public class TimerStarter : MonoBehaviour
 
         Managers.scoreManager.SaveBestTime();
         Managers.scoreManager.SaveHighScore();
+        AudioManager.instance.PlaySound("fanfare");
 
         ClearObjects();
     }

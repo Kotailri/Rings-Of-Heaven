@@ -9,6 +9,7 @@ public class PlayerHealCollision : MonoBehaviour
         if (collision.gameObject.CompareTag("Heal"))
         {
             Destroy(collision.gameObject);
+            AudioManager.instance.PlaySound("ding");
             GetComponent<PlayerHealth>().Heal(1);
         }
     }

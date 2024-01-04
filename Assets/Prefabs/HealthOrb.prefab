@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6001972765215553342}
   - component: {fileID: 1750488134262240869}
   - component: {fileID: 7208502654184776111}
+  - component: {fileID: 1377284997012977956}
   m_Layer: 0
   m_Name: HealthOrb
   m_TagString: Heal
@@ -158,3 +159,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1377284997012977956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896730597442073637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 876cf9d5887947a44bae3354242c920c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delay: 1
+  movespeed: 50
