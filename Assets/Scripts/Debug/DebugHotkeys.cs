@@ -13,4 +13,13 @@ public class DebugHotkeys : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            PlayerPrefs.DeleteAll();
+            AudioManager.instance.PlaySound("click");
+        }
+    }
 }

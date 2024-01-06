@@ -9,6 +9,10 @@ public class PlayerHazardCollision : MonoBehaviour
     private PlayerMovement pm;
     private PlayerGetHit hit;
 
+    public Transform[] checkpointChecks;
+    public LayerMask checkpointLayer;
+    public Vector2 checkpointLayerCheck;
+
     private void Awake()
     {
         pm = GetComponent<PlayerMovement>();
@@ -20,6 +24,26 @@ public class PlayerHazardCollision : MonoBehaviour
         currentCheckpoint = transform.position;
     }
 
+    private void FixedUpdate()
+    {
+        foreach (Transform t in checkpointChecks)
+        {
+            if (!Physics2D.OverlapBox(t.position, checkpointLayerCheck, 0, checkpointLayer))
+            {
+                return;
+            }
+        }
+
+        currentCheckpoint = transform.position;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        foreach (Transform t in checkpointChecks)
+            Gizmos.DrawWireCube(t.position, checkpointLayerCheck);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("RespawnsPlayer"))
@@ -29,7 +53,7 @@ public class PlayerHazardCollision : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Checkpoint"))
         {
-            currentCheckpoint = collision.gameObject.transform.position;
+            //currentCheckpoint = collision.gameObject.transform.position;
         }
     }
 
@@ -43,7 +67,7 @@ public class PlayerHazardCollision : MonoBehaviour
             transform.position = currentCheckpoint;
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
-            pm.ToggleMovement(false);
+            PlayerMovementLock.instance.LockMovement(1);
             
             StartCoroutine(EnableMovement());
         }
@@ -54,7 +78,7 @@ public class PlayerHazardCollision : MonoBehaviour
 
     private IEnumerator EnableMovement()
     {
-        yield return new WaitForSecondsRealtime(0.5f);
-        pm.ToggleMovement(true);
+        yield return new WaitForSecondsRealtime(1f);
+        PlayerMovementLock.instance.UnlockMovement(1);
     }
 }

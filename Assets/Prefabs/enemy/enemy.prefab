@@ -52,7 +52,7 @@ GameObject:
   - component: {fileID: 7913446295266699466}
   - component: {fileID: 2511581773567076437}
   - component: {fileID: 8922483658604877670}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -343,7 +343,7 @@ MonoBehaviour:
   wallDetectSize: {x: 0.5, y: 1}
   wallDetectLayer:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 200
   groundDetect: {fileID: 6056531549860102564}
   groundDetectSize: {x: 1.27, y: 0.31}
   groundDetectLayer:

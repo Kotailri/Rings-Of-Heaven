@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerDash : MonoBehaviour
+public class PlayerDash : PlayerMovementBehaviour
 {
     public float DashForce;
     public float DashTime;
@@ -38,6 +38,7 @@ public class PlayerDash : MonoBehaviour
     {
         if (PlayerUnlocks.isDashUnlocked
             && currentDashCooldown <= 0
+            && CanMove()
             && isDashing == false
             && context.phase == InputActionPhase.Started)
         {
@@ -87,12 +88,14 @@ public class PlayerDash : MonoBehaviour
             rotation = Quaternion.Euler( 0, 180f, 0 );
         }
 
-        DashParticle.Play();
+        pm.ReleaseInputs();
         Instantiate(afterImage, transform.position, rotation);
+        DashParticle.Play();
 
         RB.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
         isDashing = true;
-        pm.ToggleMovement(false);
+        PlayerMovementLock.instance.LockMovement();
+        
         lockedY = transform.position.y;
 
         yield return new WaitForSecondsRealtime(DashTime);
@@ -100,9 +103,10 @@ public class PlayerDash : MonoBehaviour
         DashParticle.Play();
         Instantiate(afterImage, transform.position, rotation);
 
-        RB.velocity = Vector2.zero;
-        pm.ToggleMovement(true);
+        PlayerMovementLock.instance.UnlockMovement();
         isDashing = false;
+
+        RB.velocity = Vector2.zero;
         RB.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
@@ -116,7 +120,8 @@ public class PlayerDash : MonoBehaviour
         if (isDashing)
         {
             pm.ReleaseInputs();
-            RB.velocity = new Vector2(dashDirection.x * DashForce, 0);
+            RB.velocity = Vector2.zero;
+            RB.velocity = new Vector2(Mathf.Sign(dashDirection.x) * DashForce, 0);
             transform.position = new Vector2(transform.position.x, (float)lockedY);
         }
 

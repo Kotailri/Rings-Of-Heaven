@@ -33,8 +33,8 @@ public class PlayerKnockback : MonoBehaviour
 
     private IEnumerator LockMovementTimer(float time)
     {
-        pm.ToggleMovement(false);
+        PlayerMovementLock.instance.LockMovement();
         yield return new WaitForSeconds(time);
-        pm.ToggleMovement(true);
+        PlayerMovementLock.instance.UnlockMovement();
     }
 }

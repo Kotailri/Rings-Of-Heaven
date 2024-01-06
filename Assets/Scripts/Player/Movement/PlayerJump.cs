@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerJump : MonoBehaviour
+public class PlayerJump : PlayerMovementBehaviour
 {
     [Space(10)]
     [Header("Gravity")]
@@ -25,21 +25,24 @@ public class PlayerJump : MonoBehaviour
     [Range(0.01f, 0.5f)] public float coyoteTime; //Grace period after falling off a platform, where you are still grounded
     [Range(0.01f, 0.5f)] public float jumpInputBufferTime; //Grace period after pressing jump, where you have still pressed jump
 
+
     [Space(15)]
     public ParticleSystem dustParticles;
 
     private Rigidbody2D RB;
     private PlayerGrounded grounded;
-    private bool canMove = true;
+
+    private float _fallSpeedYDampingChangeThreshold;
 
     // Timers
     private float lastOnGroundTime;
     private float lastPressedJumpTime;
 
-    private void Awake()
+    private void Start()
     {
         RB = GetComponent<Rigidbody2D>();
         grounded = GetComponent<PlayerGrounded>();
+        _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
     }
 
     public void JumpInputAction(InputAction.CallbackContext context)
@@ -82,7 +85,25 @@ public class PlayerJump : MonoBehaviour
             Jump(); // Do jump
         }
 
+        CheckFallCameraChange();
         ApplyGravity();
+    }
+
+    private void CheckFallCameraChange()
+    {
+        // if falling past certain speed threshold
+        if (RB.velocity.y < _fallSpeedYDampingChangeThreshold && !CameraManager.instance.IsLerpingYDamping && !CameraManager.instance.LerpedFromPlayerFalling)
+        {
+            CameraManager.instance.LerpYDamping(true);
+        }
+
+        // if standing still or moving up
+        if (RB.velocity.y >= 0f && !CameraManager.instance.IsLerpingYDamping && CameraManager.instance.LerpedFromPlayerFalling)
+        {
+            // reset so it can be called again
+            CameraManager.instance.LerpedFromPlayerFalling = false;
+            CameraManager.instance.LerpYDamping(false);
+        }
     }
 
     private void JumpCutDoubleJump()
@@ -113,15 +134,10 @@ public class PlayerJump : MonoBehaviour
         }
     }
 
-    public void ToggleMovement(bool _canMove)
-    {
-        canMove = _canMove;
-    }
-
     private void CheckDoubleJump()
     {
         // jump unlocked, not grounded, not currently double jumping, jump input
-        if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping)
+        if (PlayerUnlocks.isDoubleJumpUnlocked && lastOnGroundTime < 0 && !isDoubleJumping && CanMove())
         {
             isDoubleJumping = true; // Is now double jumping
 
@@ -152,9 +168,6 @@ public class PlayerJump : MonoBehaviour
 
     private void OnJumpInput()
     {
-        if (!canMove)
-            return;
-
         // when jump is pressed
         // set last pressed jump time to the tolerance
         // during the tolerance time, a jump is always being "pressed"
@@ -170,6 +183,11 @@ public class PlayerJump : MonoBehaviour
 
     private void Jump()
     {
+        if (!CanMove())
+        {
+            return;
+        }
+
         // Ensures we can't call Jump multiple times from one press, remove all tolerances
         lastPressedJumpTime = 0;
         lastOnGroundTime = 0;

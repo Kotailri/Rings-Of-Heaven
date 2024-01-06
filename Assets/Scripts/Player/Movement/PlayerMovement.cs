@@ -7,7 +7,7 @@ public enum PlayerRBFacingDirection
     Right, Left
 }
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : PlayerMovementBehaviour
 {
     [Header("Movement")]
     public float runMaxSpeed; //Target speed we want the player to reach.
@@ -21,9 +21,11 @@ public class PlayerMovement : MonoBehaviour
     private PlayerGrounded grounded;
     private PlayerJump pj;
 
+    [Space(15)]
     [HideInInspector]
     public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
     private Vector2 moveInput;
+    public CameraFollowObject followObject;
 
     [Space(15)]
     [Header("Ice Movement")]
@@ -32,9 +34,7 @@ public class PlayerMovement : MonoBehaviour
     public float iceSpeedMultiplier;
 
     [HideInInspector]
-    public bool canMove = true;
-
-    private Controls controls;
+    public Controls controls;
     private float axisInputX;
     private float keyboardLeft;
     private float keyboardRight;
@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         controls = new Controls();
+
+
 
         switch (Config.controlConfig)
         {
@@ -54,6 +56,8 @@ public class PlayerMovement : MonoBehaviour
                 controls.Gameplay.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
                 controls.Gameplay.KeyboardRight.canceled += ctx => keyboardRight = 0;
 
+
+                GetComponent<PlayerInput>().SwitchCurrentActionMap("Gameplay");
                 controls.Gameplay.Enable();
                 controls.GameplayWASD.Disable();
                 break;
@@ -67,27 +71,22 @@ public class PlayerMovement : MonoBehaviour
                 controls.GameplayWASD.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
                 controls.GameplayWASD.KeyboardRight.canceled += ctx => keyboardRight = 0;
 
+
+                GetComponent<PlayerInput>().SwitchCurrentActionMap("GameplayWASD");
                 controls.GameplayWASD.Enable();
                 controls.Gameplay.Disable();
                 break;
         }
+
+        GetComponent<PlayerFacing>().SetupControls(controls);
         
 
         RB = GetComponent<Rigidbody2D>();
         pj = GetComponent<PlayerJump>();
         grounded = GetComponent<PlayerGrounded>();
-    }
 
-    private void Start()
-    {
         ReleaseInputs();
         RB.velocity = Vector2.zero;
-    }
-
-    public void ToggleMovement(bool _canMove)
-    {
-        canMove = _canMove;
-        pj.ToggleMovement(_canMove);
     }
 
     public void ReleaseInputs()
@@ -97,6 +96,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (!CanMove())
+        {
+            return;
+        }
+
         // Get the x moveinput
         float controllerInputX = 0;
         if (Mathf.Abs(axisInputX) >= Config.ControllerDeadZone)
@@ -138,6 +142,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!CanMove())
+        {
+            return;
+        }
+
         if (grounded.isIcy)
             RunOnIce();
         else
@@ -146,8 +155,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
-        if (!canMove) return;
-
         //Calculate the direction we want to move in and our desired velocity
         float targetSpeed = moveInput.x * runMaxSpeed;
 
@@ -226,6 +233,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         transform.rotation = Quaternion.Euler(rotator);
+        followObject.CallTurn();
 
         if (grounded.isGrounded)
         {

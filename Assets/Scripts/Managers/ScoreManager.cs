@@ -59,8 +59,8 @@ public class ScoreManager : MonoBehaviour
     }
 
     // SAVE LOAD SCORE
-    private const string HIGH_SCORE_KEY = "HighScore";
-    private const string BEST_TIME_KEY = "BestTime";
+    private const string HIGH_SCORE_KEY = "HighScore2";
+    private const string BEST_TIME_KEY = "BestTime2";
 
     public void SaveHighScore()
     {

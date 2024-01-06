@@ -11,16 +11,18 @@ public class PlayerFacing : MonoBehaviour
     private PlayerFacingDirection facingDirection = PlayerFacingDirection.Right;
     private PlayerMovement pm;
 
-    private Controls controls;
     private float axisInputY;
 
     private float KeyboardUp = 0f;
     private float KeyboardDown = 0f;
 
-    private void Awake()
+    private void Start()
     {
-        controls = new Controls();
+        pm = GetComponent<PlayerMovement>();
+    }
 
+    public void SetupControls(Controls controls)
+    {
         switch (Config.controlConfig)
         {
             case ControlConfig.Arrows:
@@ -32,9 +34,6 @@ public class PlayerFacing : MonoBehaviour
                 controls.Gameplay.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
                 controls.Gameplay.KeyboardDown.canceled += ctx => KeyboardDown = 0;
 
-                controls.Gameplay.Enable();
-                controls.GameplayWASD.Disable();
-
                 break;
 
             case ControlConfig.WASD:
@@ -45,13 +44,8 @@ public class PlayerFacing : MonoBehaviour
 
                 controls.GameplayWASD.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
                 controls.GameplayWASD.KeyboardDown.canceled += ctx => KeyboardDown = 0;
-
-                controls.GameplayWASD.Enable();
-                controls.Gameplay.Disable();
                 break;
         }
-        
-        pm = GetComponent<PlayerMovement>();
     }
 
     public PlayerFacingDirection GetFacingDirection()

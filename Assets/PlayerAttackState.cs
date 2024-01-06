@@ -13,6 +13,7 @@ public class PlayerAttackState : StateMachineBehaviour
         if (player.GetComponent<PlayerGrounded>().isGrounded && !player.GetComponent<PlayerGrounded>().isIcy)
         {
             player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+            PlayerMovementLock.instance.LockMovement();
         }
         
     }
@@ -21,16 +22,19 @@ public class PlayerAttackState : StateMachineBehaviour
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<PlayerMovement>().ToggleMovement(false);
-        player.GetComponent<PlayerMovement>().ReleaseInputs();
-        //player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+        if (player.GetComponent<PlayerGrounded>().isGrounded && !player.GetComponent<PlayerGrounded>().isIcy)
+        {
+            player.GetComponent<PlayerMovement>().ReleaseInputs();
+            player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+        }
+        
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<PlayerMovement>().ToggleMovement(true);
+        PlayerMovementLock.instance.UnlockMovement();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()
