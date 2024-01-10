@@ -1,115 +1,71 @@
-
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public enum PlayerRBFacingDirection
-{
-    Right, Left
-}
-
+[RequireComponent (typeof(Rigidbody2D))]
+[RequireComponent (typeof(PlayerGrounded))]
+[RequireComponent (typeof(PlayerAxisControl))]
+[RequireComponent (typeof(PlayerFacing))]
 public class PlayerMovement : PlayerMovementBehaviour
 {
     [Header("Movement")]
-    public float runMaxSpeed; //Target speed we want the player to reach.
-    public float runAccelAmount; //The actual force (multiplied with speedDiff) applied to the player.
-    public float runDeccelAmount; //Actual force (multiplied with speedDiff) applied to the player .
+    [SerializeField] private float MovementSpeed; //Target speed we want the player to reach.
 
-    [Space(15)]
-    public ParticleSystem dustParticles;
+    [Header("Friction")]
+    public float Slipperyness;
+    public float SlipSpeedMultiplier;
 
-    private Rigidbody2D RB;
-    private PlayerGrounded grounded;
-    private PlayerJump pj;
-
-    [Space(15)]
-    [HideInInspector]
-    public PlayerRBFacingDirection facing = PlayerRBFacingDirection.Right;
-    private Vector2 moveInput;
+    [Space(10f)]
+    [Header("Extras")]
+    public ParticleSystem     dustParticles;
     public CameraFollowObject followObject;
 
-    [Space(15)]
-    [Header("Ice Movement")]
-    public bool OnIce;
-    public float slipperyness;
-    public float iceSpeedMultiplier;
+    private Rigidbody2D       RB;
+    private PlayerGrounded    grounded;
+    private PlayerAxisControl axisControl;
+    private PlayerFacing      facing;
 
-    [HideInInspector]
-    public Controls controls;
-    private float axisInputX;
-    private float keyboardLeft;
-    private float keyboardRight;
+    private Vector2 moveInput;
 
     private void Awake()
     {
-        controls = new Controls();
-
-
-
-        switch (Config.controlConfig)
-        {
-            case ControlConfig.Arrows:
-                controls.Gameplay.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
-
-                controls.Gameplay.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
-                controls.Gameplay.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
-
-                controls.Gameplay.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
-                controls.Gameplay.KeyboardRight.canceled += ctx => keyboardRight = 0;
-
-
-                GetComponent<PlayerInput>().SwitchCurrentActionMap("Gameplay");
-                controls.Gameplay.Enable();
-                controls.GameplayWASD.Disable();
-                break;
-
-            case ControlConfig.WASD:
-                controls.GameplayWASD.MoveX.performed += ctx => axisInputX = ctx.ReadValue<float>();
-
-                controls.GameplayWASD.KeyboardLeft.performed += ctx => keyboardLeft = ctx.ReadValue<float>();
-                controls.GameplayWASD.KeyboardLeft.canceled += ctx => keyboardLeft = 0;
-
-                controls.GameplayWASD.KeyboardRight.performed += ctx => keyboardRight = ctx.ReadValue<float>();
-                controls.GameplayWASD.KeyboardRight.canceled += ctx => keyboardRight = 0;
-
-
-                GetComponent<PlayerInput>().SwitchCurrentActionMap("GameplayWASD");
-                controls.GameplayWASD.Enable();
-                controls.Gameplay.Disable();
-                break;
-        }
-
-        GetComponent<PlayerFacing>().SetupControls(controls);
-        
-
-        RB = GetComponent<Rigidbody2D>();
-        pj = GetComponent<PlayerJump>();
-        grounded = GetComponent<PlayerGrounded>();
-
-        ReleaseInputs();
-        RB.velocity = Vector2.zero;
+        RB          = GetComponent<Rigidbody2D>();
+        grounded    = GetComponent<PlayerGrounded>();
+        axisControl = GetComponent<PlayerAxisControl>();
+        facing      = GetComponent<PlayerFacing>();
     }
 
-    public void ReleaseInputs()
+    private void OnValidate()
     {
-        moveInput = Vector2.zero;
+        if (Slipperyness <= 0)
+        {
+            Slipperyness = 0.1f;
+        }
+
+        if (SlipSpeedMultiplier <= 0)
+        {
+            SlipSpeedMultiplier = 1;
+        }
+
+        if (MovementSpeed <= 1)
+        {
+            MovementSpeed = 1;
+        }
     }
 
     private void Update()
     {
         if (!CanMove())
-        {
             return;
-        }
 
-        // Get the x moveinput
+        // Get axis x input
         float controllerInputX = 0;
-        if (Mathf.Abs(axisInputX) >= Config.ControllerDeadZone)
+        if (Mathf.Abs(axisControl.GetAxisInputX()) >= Config.ControllerDeadZone)
         {
-            controllerInputX = axisInputX;
+            if (axisControl.GetAxisInputX() < 0) { controllerInputX = -1; }
+            if (axisControl.GetAxisInputX() > 0) { controllerInputX = 1; }
         }
 
-        float keyboardInputX = keyboardRight - keyboardLeft;
-
+        // Get keyboard x input if controller not available
+        float keyboardInputX = axisControl.GetKeyboardRight() - axisControl.GetKeyboardLeft();
         if (controllerInputX != 0)
         {
             moveInput.x = controllerInputX;
@@ -135,101 +91,107 @@ public class PlayerMovement : PlayerMovementBehaviour
         }
     }
 
-    public float GetMoveInputX()
-    {
-        return moveInput.x;
-    }
-
     private void FixedUpdate()
     {
         if (!CanMove())
-        {
             return;
-        }
 
-        if (grounded.isIcy)
-            RunOnIce();
-        else
-            Run();
+        Run();
     }
 
+    /// <summary>
+    /// Releases all movement inputs for a single frame
+    /// </summary>
+    public void ReleaseInputs()
+    {
+        moveInput = Vector2.zero;
+    }
+
+    /// <summary>
+    /// Move the player horizontally
+    /// </summary>
     private void Run()
     {
-        //Calculate the direction we want to move in and our desired velocity
-        float targetSpeed = moveInput.x * runMaxSpeed;
-
-        // Apply acceleration/decceleration
-        float accelRate;
-        if (Mathf.Abs(targetSpeed) > 0.01)
-            accelRate = runAccelAmount;
-        else
-            accelRate = runDeccelAmount;
-
-        //Calculate difference between current velocity and desired velocity
-        float speedDif = targetSpeed - RB.velocity.x;
-
-        //Calculate force along x-axis to apply to thr player
-        float movement = speedDif * accelRate;
-
-        //Convert this to a vector and apply to rigidbody
-        RB.AddForce(movement * Vector2.right, ForceMode2D.Force);
-    }
-
-    private void RunOnIce()
-    {
-        float targetSpeed = moveInput.x * runMaxSpeed * iceSpeedMultiplier;
+        float targetSpeed = moveInput.x * MovementSpeed * SlipSpeedMultiplier;
         float currVelocity = RB.velocity.x;
-        
-        if (moveInput.x == 0.0f) // trying to stop
+
+        // Trying to Stop:
+        // Constantly slow movespeed until stopped
+        if (moveInput.x == 0.0f)
         {
-            if (Mathf.Abs(currVelocity) > 0.1f) // keep slowing down
+            // Trying to stop
+            if (Mathf.Abs(currVelocity) > (1.0f / Slipperyness))
             {
                 float factor = 0f;
                 if (currVelocity < 0)
                 {
-                    factor = currVelocity + (1.0f / slipperyness);
+                    factor = currVelocity + (1.0f / Slipperyness);
                 }
+
                 else if (currVelocity > 0)
                 {
-                    factor = currVelocity - (1.0f / slipperyness);
+                    factor = currVelocity - (1.0f / Slipperyness);
                 }
+
                 RB.velocity = new Vector2(factor, RB.velocity.y);
             }
-        }
-        else // trying to move
-        {
-            if (moveInput.x > 0.0f) // want to move right
+            else
             {
-                if (currVelocity < targetSpeed) // keep speeding up right direction
+                RB.velocity = new Vector2(0, RB.velocity.y);
+            }
+        }
+
+        // Trying to Move:
+        // Constantly speed up until velocity is max speed * slip ispeed
+        else
+        {
+            // Trying to move right
+            if (moveInput.x > 0.0f)
+            {
+                if (currVelocity < targetSpeed)
                 {
-                    float factor = currVelocity + (1.0f / slipperyness);
+                    float factor = currVelocity + (1.0f / Slipperyness);
                     RB.velocity = new Vector2(factor, RB.velocity.y);
                 }
-            }
-            else if (moveInput.x < 0.0f) // want to move left
-            {
-                if (currVelocity > targetSpeed) // keep speeding up left direction
+                else
                 {
-                    float factor = currVelocity - (1.0f / slipperyness);
+                    RB.velocity = new Vector2(targetSpeed, RB.velocity.y);
+                }
+            }
+
+            // Trying to move left
+            else if (moveInput.x < 0.0f)
+            {
+                if (currVelocity > targetSpeed)
+                {
+                    float factor = currVelocity - (1.0f / Slipperyness);
                     RB.velocity = new Vector2(factor, RB.velocity.y);
+                }
+                else
+                {
+                    RB.velocity = new Vector2(targetSpeed, RB.velocity.y);
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Rotates the player about the Y axis to flip
+    /// Sets the new facing direction
+    /// </summary>
     private void Turn()
     {
         Vector3 rotator;
 
-        if (facing == PlayerRBFacingDirection.Right)
+        if (facing.FacingDirection == OrthogonalDirection.Right)
         {
             rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
-            facing = PlayerRBFacingDirection.Left;
+            facing.FacingDirection = OrthogonalDirection.Left;
         }
         else
         {
             rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
-            facing = PlayerRBFacingDirection.Right;
+            facing.FacingDirection = OrthogonalDirection.Right;
         }
 
         transform.rotation = Quaternion.Euler(rotator);
@@ -239,19 +201,23 @@ public class PlayerMovement : PlayerMovementBehaviour
         {
             dustParticles.Play();
         }
-            
+
     }
 
+    /// <summary>
+    /// Check if Turn() is to be called.
+    /// </summary>
+    /// <param name="isFacingRight"></param>
     public void CheckDirectionToFace(bool isFacingRight)
     {
         if (isFacingRight)
         {
-            if (facing != PlayerRBFacingDirection.Right)
+            if (facing.FacingDirection != OrthogonalDirection.Right)
                 Turn();
         }
         else
         {
-            if (facing != PlayerRBFacingDirection.Left)
+            if (facing.FacingDirection != OrthogonalDirection.Left)
                 Turn();
         }
     }

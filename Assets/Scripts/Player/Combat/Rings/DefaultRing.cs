@@ -29,24 +29,24 @@ public class DefaultRing : Ring, IRingCatchable, IRingReturn
         return ringSpeed;
     }
 
-    public override void SendRing(PlayerFacingDirection direction)
+    public override void SendRing(OrthogonalDirection direction)
     {
         Vector2 v = Vector2.zero;
         switch (direction)
         {
-            case PlayerFacingDirection.Left:
+            case OrthogonalDirection.Left:
                 v = new(-range, 0);
                 break;
 
-            case PlayerFacingDirection.Right:
+            case OrthogonalDirection.Right:
                 v = new(range, 0);
                 break;
 
-            case PlayerFacingDirection.Up:
+            case OrthogonalDirection.Up:
                 v = new(0, range);
                 break;
 
-            case PlayerFacingDirection.Down:
+            case OrthogonalDirection.Down:
                 v = new(0, -range);
                 break;
         }

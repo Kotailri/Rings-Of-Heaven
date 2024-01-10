@@ -145,7 +145,7 @@ public class PlayerJump : PlayerMovementBehaviour
             RB.velocity = new Vector2(RB.velocity.x, 0); // Zero the fall speed
 
             RB.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Apply Jump
-            GetComponent<PlayerDash>().airDashReady = true;
+            GetComponent<PlayerDash>().AirDashReady = true;
             dustParticles.Play();
             AudioManager.instance.PlaySound("fluff");
         }

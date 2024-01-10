@@ -1,126 +1,93 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public enum PlayerFacingDirection
+public enum OrthogonalDirection
 {
     Up, Down, Left, Right, None
 }
 
 public class PlayerFacing : MonoBehaviour
 {
-    private PlayerFacingDirection facingDirection = PlayerFacingDirection.Right;
-    private PlayerMovement pm;
+    public OrthogonalDirection FacingDirection   { get; set; } = OrthogonalDirection.Right;  // Direction based on keyboard input
+    public OrthogonalDirection PointingDirection { get; set; } = OrthogonalDirection.None;   // Direction based on player facing direction
 
-    private float axisInputY;
+    private PlayerAxisControl axisControl;
 
-    private float KeyboardUp = 0f;
-    private float KeyboardDown = 0f;
-
-    private void Start()
+    private void Awake()
     {
-        pm = GetComponent<PlayerMovement>();
+        axisControl = GetComponent<PlayerAxisControl>();
     }
 
-    public void SetupControls(Controls controls)
-    {
-        switch (Config.controlConfig)
-        {
-            case ControlConfig.Arrows:
-                controls.Gameplay.MoveY.performed += ctx => axisInputY = ctx.ReadValue<float>();
-
-                controls.Gameplay.KeyboardUp.performed += ctx => KeyboardUp = ctx.ReadValue<float>();
-                controls.Gameplay.KeyboardUp.canceled += ctx => KeyboardUp = 0;
-
-                controls.Gameplay.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
-                controls.Gameplay.KeyboardDown.canceled += ctx => KeyboardDown = 0;
-
-                break;
-
-            case ControlConfig.WASD:
-                controls.GameplayWASD.MoveY.performed += ctx => axisInputY = ctx.ReadValue<float>();
-
-                controls.GameplayWASD.KeyboardUp.performed += ctx => KeyboardUp = ctx.ReadValue<float>();
-                controls.GameplayWASD.KeyboardUp.canceled += ctx => KeyboardUp = 0;
-
-                controls.GameplayWASD.KeyboardDown.performed += ctx => KeyboardDown = ctx.ReadValue<float>();
-                controls.GameplayWASD.KeyboardDown.canceled += ctx => KeyboardDown = 0;
-                break;
-        }
-    }
-
-    public PlayerFacingDirection GetFacingDirection()
-    {
-        return facingDirection;
-    }
-
-    public PlayerRBFacingDirection GetFacingDirectionRB()
-    {
-        return pm.facing;
-    }
-
-    private void CheckKeyboard(float input)
+    /// <summary>
+    /// Sets PointingDirection based on keyboard inputs.
+    /// </summary>
+    /// <param name="input"></param>
+    private void CheckKeyboardPointingDirection(float input)
     {
         if (input == 1)
         {
-            facingDirection = PlayerFacingDirection.Up;
+            PointingDirection = OrthogonalDirection.Up;
             return;
         }
 
         if (input == -1)
         {
-            facingDirection = PlayerFacingDirection.Down;
+            PointingDirection = OrthogonalDirection.Down;
             return;
         }
 
-        if (pm.facing == PlayerRBFacingDirection.Left)
+        if (FacingDirection == OrthogonalDirection.Left)
         {
-            facingDirection = PlayerFacingDirection.Left;
+            PointingDirection = OrthogonalDirection.Left;
             return;
         }
 
-        if (pm.facing == PlayerRBFacingDirection.Right)
+        if (FacingDirection == OrthogonalDirection.Right)
         {
-            facingDirection = PlayerFacingDirection.Right;
+            PointingDirection = OrthogonalDirection.Right;
             return;
         }
     }
 
-    private void CheckController(float axisInput)
+    /// <summary>
+    /// Sets PointingDirection based on controller axis inputs.
+    /// </summary>
+    /// <param name="axisInput"></param>
+    private void CheckControllerPointingDirection(float axisInput)
     {
         if (axisInput > 0)
         {
-            facingDirection = PlayerFacingDirection.Up;
+            PointingDirection = OrthogonalDirection.Up;
             return;
         }
 
         if (axisInput < 0)
         {
-            facingDirection = PlayerFacingDirection.Down;
+            PointingDirection = OrthogonalDirection.Down;
             return;
         }
 
-        if (pm.facing == PlayerRBFacingDirection.Left)
+        if (FacingDirection == OrthogonalDirection.Left)
         {
-            facingDirection = PlayerFacingDirection.Left;
+            PointingDirection = OrthogonalDirection.Left;
             return;
         }
 
-        if (pm.facing == PlayerRBFacingDirection.Right)
+        if (FacingDirection == OrthogonalDirection.Right)
         {
-            facingDirection = PlayerFacingDirection.Right;
+            PointingDirection = OrthogonalDirection.Right;
             return;
         }
     }
 
     private void Update()
     {
-        if (Mathf.Abs(axisInputY) >= Config.ControllerDeadZone)
+        if (Mathf.Abs(axisControl.GetAxisInputY()) >= Config.ControllerDeadZone)
         {
-            CheckController(axisInputY);
+            CheckControllerPointingDirection(axisControl.GetAxisInputY());
         }
         else
         {
-            CheckKeyboard(KeyboardUp - KeyboardDown);
+            CheckKeyboardPointingDirection(axisControl.GetKeyboardUp() - axisControl.GetKeyboardDown());
         }
     }
 }

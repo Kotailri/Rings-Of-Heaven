@@ -10,12 +10,12 @@ public class CameraFollowObject : MonoBehaviour
     [Header("Flip Rotation Stats")]
     public float _flipYRotationTime = 0.5f;
 
-    private PlayerMovement pm;
+    private PlayerFacing playerFacing;
 
 
     private void Awake()
     {
-        pm = _playerTransform.gameObject.GetComponent<PlayerMovement>();
+        playerFacing = _playerTransform.gameObject.GetComponent<PlayerFacing>();
     }
 
     private void Update()
@@ -30,12 +30,12 @@ public class CameraFollowObject : MonoBehaviour
 
     private float DetermineEndRotation()
     {
-        if (pm.facing == PlayerRBFacingDirection.Right)
+        if (playerFacing.FacingDirection == OrthogonalDirection.Right)
         {
             return 0f;
         }
 
-        if (pm.facing == PlayerRBFacingDirection.Left)
+        if (playerFacing.FacingDirection == OrthogonalDirection.Left)
         {
             return 180f;
         }

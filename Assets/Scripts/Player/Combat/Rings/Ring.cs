@@ -7,7 +7,7 @@ public abstract class Ring : MonoBehaviour
     protected float range = 15.0f;
     public abstract float GetRingSpeed();
     public abstract int GetRingDamage();
-    public abstract void SendRing(PlayerFacingDirection direction);
+    public abstract void SendRing(OrthogonalDirection direction);
 
     protected void OnTriggerStay2D(Collider2D collision)
     {

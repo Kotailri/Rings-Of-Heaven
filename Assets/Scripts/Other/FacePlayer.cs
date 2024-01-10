@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FacePlayer : MonoBehaviour
 {
-    public PlayerRBFacingDirection initialFacingDirection;
+    public OrthogonalDirection initialFacingDirection;
 
     private Transform player;
 
@@ -15,7 +15,7 @@ public class FacePlayer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (initialFacingDirection == PlayerRBFacingDirection.Right)
+        if (initialFacingDirection == OrthogonalDirection.Right)
         {
             if (transform.position.x > player.position.x) // me | player
             {
@@ -27,7 +27,7 @@ public class FacePlayer : MonoBehaviour
             }
         }
 
-        else if (initialFacingDirection == PlayerRBFacingDirection.Left)
+        else if (initialFacingDirection == OrthogonalDirection.Left)
         {
             if (transform.position.x < player.position.x) // player | me
             {

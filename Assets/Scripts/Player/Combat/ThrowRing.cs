@@ -139,23 +139,23 @@ public class ThrowRing : MonoBehaviour
 
 
 
-        switch (pf.GetFacingDirection())
+        switch (pf.PointingDirection)
         {
-            case PlayerFacingDirection.Left:
+            case OrthogonalDirection.Left:
                 if (Physics2D.OverlapBox(ringBlockFront.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
                 throwdir += new Vector2(-rangeHorizontal, 0);
                 break;
 
-            case PlayerFacingDirection.Right:
+            case OrthogonalDirection.Right:
                 if (Physics2D.OverlapBox(ringBlockFront.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
                 throwdir += new Vector2(rangeHorizontal, 0);
                 break;
 
-            case PlayerFacingDirection.Up:
+            case OrthogonalDirection.Up:
                 if (Physics2D.OverlapBox(ringBlockUp.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
@@ -163,7 +163,7 @@ public class ThrowRing : MonoBehaviour
                 throwdir += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, rangeVertical);
                 break;
 
-            case PlayerFacingDirection.Down:
+            case OrthogonalDirection.Down:
                 if (Physics2D.OverlapBox(ringBlockDown.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
@@ -172,7 +172,7 @@ public class ThrowRing : MonoBehaviour
                 break;
         }
 
-        PlayerFacingDirection savedThrowDirection = pf.GetFacingDirection();
+        OrthogonalDirection savedThrowDirection = pf.PointingDirection;
 
         GetComponent<Animator>().SetTrigger("attack");
 

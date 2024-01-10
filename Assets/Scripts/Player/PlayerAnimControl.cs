@@ -25,7 +25,7 @@ public class PlayerAnimControl : MonoBehaviour
         {
             anim.SetInteger("isFlying", 0);
 
-            if (Mathf.Abs(pm.GetMoveInputX()) > 0)
+            if (Mathf.Abs(RB.velocity.x) > 0.5)
             {
                 anim.SetBool("isWalking", true);
             }
