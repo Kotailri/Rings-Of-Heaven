@@ -3,15 +3,19 @@ using UnityEngine;
 
 public class PlayerKnockback : MonoBehaviour
 {
-    private Rigidbody2D RB;
-    private PlayerMovement pm;
+    private Rigidbody2D _RB;
 
     private void Awake()
     {
-        RB = GetComponent<Rigidbody2D>();
-        pm = GetComponent<PlayerMovement>();
+        _RB = GetComponent<Rigidbody2D>();
     }
 
+    /// <summary>
+    /// Add a knockback force to the player
+    /// </summary>
+    /// <param name="knockbackForce"></param>
+    /// <param name="stunTime"></param>
+    /// <param name="hitPosition"></param>
     public void DoKnockback(float knockbackForce, float stunTime, Vector2 hitPosition)
     {
         StartCoroutine(LockMovementTimer(stunTime));
@@ -27,8 +31,8 @@ public class PlayerKnockback : MonoBehaviour
             forceDirection = new Vector2(2, 0.1f);
         }
 
-        RB.velocity = Vector2.zero;
-        RB.AddForce(forceDirection * knockbackForce, ForceMode2D.Impulse);
+        _RB.velocity = Vector2.zero;
+        _RB.AddForce(forceDirection * knockbackForce, ForceMode2D.Impulse);
     }
 
     private IEnumerator LockMovementTimer(float time)

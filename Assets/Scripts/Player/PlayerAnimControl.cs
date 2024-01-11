@@ -21,7 +21,7 @@ public class PlayerAnimControl : MonoBehaviour
 
     private void Update()
     {
-        if (grounded.isGrounded)
+        if (grounded.IsGrounded)
         {
             anim.SetInteger("isFlying", 0);
 

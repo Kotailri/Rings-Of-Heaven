@@ -5,29 +5,6 @@ using UnityEngine;
 
 public static class Utility
 {
-    #region Debug Print
-    public static void PrintCol(string print, string hexkey)
-    {
-        Debug.Log("<color=#" + hexkey + ">" + print + "</color>");
-    }
-
-    public static void PrintCol(string print, Color color)
-    {
-        PrintCol(print, ColorUtility.ToHtmlStringRGB(color));
-    }
-
-    public static void PrintWarn(string print)
-    {
-        PrintCol(print, "FFA500");
-    }
-
-    public static void PrintErr(string print)
-    {
-        PrintCol(print, "FF0000");
-        Time.timeScale = 0;
-    }
-    #endregion
-
     public static int BoolToInt(bool input)
     {
         return input ? 1 : 0;

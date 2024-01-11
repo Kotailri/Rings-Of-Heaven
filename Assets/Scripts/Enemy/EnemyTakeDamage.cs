@@ -78,7 +78,7 @@ public class EnemyTakeDamage : MonoBehaviour
         }
         else
         {
-            Utility.PrintWarn("No damage was applied to [" + gameObject.name + "]");
+            Logger.PrintWarn("No damage was applied to [" + gameObject.name + "]");
         }
 
         if (TryGetComponent(out FlashEffect fe))

@@ -10,7 +10,7 @@ public class PlayerAttackState : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player.GetComponent<PlayerGrounded>().isGrounded && !player.GetComponent<PlayerGrounded>().isIcy)
+        if (player.GetComponent<PlayerGrounded>().IsGrounded && !player.GetComponent<PlayerGrounded>().IsIcy)
         {
             player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
             PlayerMovementLock.instance.LockMovement();
@@ -22,7 +22,7 @@ public class PlayerAttackState : StateMachineBehaviour
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player.GetComponent<PlayerGrounded>().isGrounded && !player.GetComponent<PlayerGrounded>().isIcy)
+        if (player.GetComponent<PlayerGrounded>().IsGrounded && !player.GetComponent<PlayerGrounded>().IsIcy)
         {
             player.GetComponent<PlayerMovement>().ReleaseInputs();
             player.GetComponent<Rigidbody2D>().velocity = Vector3.zero;

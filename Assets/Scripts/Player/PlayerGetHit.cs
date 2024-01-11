@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class PlayerGetHit : MonoBehaviour
 {
-    private bool canGetHit = true;
+    private bool  _canGetHit = true;
+    [SerializeField] private float _stunDuration = 0.25f;
+    [SerializeField] private float _knockbackForce = 10.0f;
+    [SerializeField] private float _invincibilityDuration = 1.5f;
 
-    private float stunDuration = 0.25f;
-    private float knockbackForce = 10.0f;
-    private float invincibilityDuration = 1.5f;
+    private PlayerHealth    _playerHealth;
+    private PlayerKnockback _playerKnockback;
 
-    private PlayerHealth health;
-    private PlayerKnockback knockback;
-    public SpriteRenderer playerSprite;
+    public SpriteRenderer PlayerSprite;
 
     private void Awake()
     {
-        health = GetComponent<PlayerHealth>();
-        knockback = GetComponent<PlayerKnockback>();
+        _playerHealth    = GetComponent<PlayerHealth>();
+        _playerKnockback = GetComponent<PlayerKnockback>();
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (canGetHit == false)
+        if (_canGetHit == false)
             return;
 
         if (collision.gameObject.TryGetComponent(out DamagePlayerOnHit damagePlayerOnHit))
@@ -33,30 +33,30 @@ public class PlayerGetHit : MonoBehaviour
 
     public void ApplyHit(int damage, Vector2 hitPosition, bool withKnockback=true)
     {
-        if (canGetHit == false)
+        if (_canGetHit == false)
             return;
 
-        if (health.currentHealth > 1)
+        if (_playerHealth.currentHealth > 1)
         {
             if (withKnockback)
             {
-                knockback.DoKnockback(knockbackForce, stunDuration, hitPosition);
+                _playerKnockback.DoKnockback(_knockbackForce, _stunDuration, hitPosition);
             }
 
-            StartCoroutine(ApplyIFrames(invincibilityDuration));
+            StartCoroutine(ApplyIFrames(_invincibilityDuration));
         }
 
-        health.TakeDamage(damage);
+        _playerHealth.TakeDamage(damage);
     }
 
     private IEnumerator ApplyIFrames(float duration)
     {
-        canGetHit = false;
-        playerSprite.color = new Color(1, 0, 0, 0.5f);
+        _canGetHit = false;
+        PlayerSprite.color = new Color(1, 0, 0, 0.5f);
 
         yield return new WaitForSeconds(duration);
 
-        canGetHit = true;
-        playerSprite.color = new Color(1, 1, 1, 1);
+        _canGetHit = true;
+        PlayerSprite.color = new Color(1, 1, 1, 1);
     }
 }

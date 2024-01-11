@@ -7,48 +7,28 @@ using UnityEngine;
 public class PlayerMovement : PlayerMovementBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float MovementSpeed; //Target speed we want the player to reach.
+    [Range(1, 100)]
+    [SerializeField]   private float MovementSpeed; // Target speed we want the player to reach
 
     [Header("Friction")]
-    public float Slipperyness;
-    public float SlipSpeedMultiplier;
+    [Range(0.1f, 10f)] public float Slipperyness; // How hard it is to change direction / stop
+    [Range(1, 10)]     public float SlipSpeedMultiplier; // How much faster player can accelerate while slipping
 
-    [Space(10f)]
-    [Header("Extras")]
-    public ParticleSystem     dustParticles;
-    public CameraFollowObject followObject;
-
-    private Rigidbody2D       RB;
-    private PlayerGrounded    grounded;
-    private PlayerAxisControl axisControl;
-    private PlayerFacing      facing;
+    private Rigidbody2D         _RB;
+    private PlayerGrounded      _playerGrounded;
+    private PlayerAxisControl   _axisControl;
+    private PlayerFacing        _playerFacing;
+    private PlayerCameraHandler _playerCameraHandler;
 
     private Vector2 moveInput;
 
     private void Awake()
     {
-        RB          = GetComponent<Rigidbody2D>();
-        grounded    = GetComponent<PlayerGrounded>();
-        axisControl = GetComponent<PlayerAxisControl>();
-        facing      = GetComponent<PlayerFacing>();
-    }
-
-    private void OnValidate()
-    {
-        if (Slipperyness <= 0)
-        {
-            Slipperyness = 0.1f;
-        }
-
-        if (SlipSpeedMultiplier <= 0)
-        {
-            SlipSpeedMultiplier = 1;
-        }
-
-        if (MovementSpeed <= 1)
-        {
-            MovementSpeed = 1;
-        }
+        _RB                  = GetComponent<Rigidbody2D>();
+        _playerGrounded      = GetComponent<PlayerGrounded>();
+        _axisControl         = GetComponent<PlayerAxisControl>();
+        _playerFacing        = GetComponent<PlayerFacing>();
+        _playerCameraHandler = GetComponent<PlayerCameraHandler>();
     }
 
     private void Update()
@@ -58,14 +38,14 @@ public class PlayerMovement : PlayerMovementBehaviour
 
         // Get axis x input
         float controllerInputX = 0;
-        if (Mathf.Abs(axisControl.GetAxisInputX()) >= Config.ControllerDeadZone)
+        if (Mathf.Abs(_axisControl.GetAxisInputX()) >= Config.ControllerDeadZone)
         {
-            if (axisControl.GetAxisInputX() < 0) { controllerInputX = -1; }
-            if (axisControl.GetAxisInputX() > 0) { controllerInputX = 1; }
+            if (_axisControl.GetAxisInputX() < 0) { controllerInputX = -1; }
+            if (_axisControl.GetAxisInputX() > 0) { controllerInputX = 1; }
         }
 
         // Get keyboard x input if controller not available
-        float keyboardInputX = axisControl.GetKeyboardRight() - axisControl.GetKeyboardLeft();
+        float keyboardInputX = _axisControl.GetKeyboardRight() - _axisControl.GetKeyboardLeft();
         if (controllerInputX != 0)
         {
             moveInput.x = controllerInputX;
@@ -96,7 +76,7 @@ public class PlayerMovement : PlayerMovementBehaviour
         if (!CanMove())
             return;
 
-        Run();
+        MovePlayerHorizontal();
     }
 
     /// <summary>
@@ -110,10 +90,10 @@ public class PlayerMovement : PlayerMovementBehaviour
     /// <summary>
     /// Move the player horizontally
     /// </summary>
-    private void Run()
+    private void MovePlayerHorizontal()
     {
         float targetSpeed = moveInput.x * MovementSpeed * SlipSpeedMultiplier;
-        float currVelocity = RB.velocity.x;
+        float currVelocity = _RB.velocity.x;
 
         // Trying to Stop:
         // Constantly slow movespeed until stopped
@@ -133,12 +113,13 @@ public class PlayerMovement : PlayerMovementBehaviour
                     factor = currVelocity - (1.0f / Slipperyness);
                 }
 
-                RB.velocity = new Vector2(factor, RB.velocity.y);
+                _RB.velocity = new Vector2(factor, _RB.velocity.y);
             }
             else
             {
-                RB.velocity = new Vector2(0, RB.velocity.y);
+                _RB.velocity = new Vector2(0, _RB.velocity.y);
             }
+            PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnPlayerStop, null);
         }
 
         // Trying to Move:
@@ -151,11 +132,11 @@ public class PlayerMovement : PlayerMovementBehaviour
                 if (currVelocity < targetSpeed)
                 {
                     float factor = currVelocity + (1.0f / Slipperyness);
-                    RB.velocity = new Vector2(factor, RB.velocity.y);
+                    _RB.velocity = new Vector2(factor, _RB.velocity.y);
                 }
                 else
                 {
-                    RB.velocity = new Vector2(targetSpeed, RB.velocity.y);
+                    _RB.velocity = new Vector2(targetSpeed, _RB.velocity.y);
                 }
             }
 
@@ -165,13 +146,14 @@ public class PlayerMovement : PlayerMovementBehaviour
                 if (currVelocity > targetSpeed)
                 {
                     float factor = currVelocity - (1.0f / Slipperyness);
-                    RB.velocity = new Vector2(factor, RB.velocity.y);
+                    _RB.velocity = new Vector2(factor, _RB.velocity.y);
                 }
                 else
                 {
-                    RB.velocity = new Vector2(targetSpeed, RB.velocity.y);
+                    _RB.velocity = new Vector2(targetSpeed, _RB.velocity.y);
                 }
             }
+            PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnPlayerMove, null);
         }
     }
 
@@ -183,24 +165,27 @@ public class PlayerMovement : PlayerMovementBehaviour
     {
         Vector3 rotator;
 
-        if (facing.FacingDirection == OrthogonalDirection.Right)
+        if (_playerFacing.FacingDirection == OrthogonalDirection.Right)
         {
             rotator = new Vector3(transform.rotation.x, 180f, transform.rotation.z);
-            facing.FacingDirection = OrthogonalDirection.Left;
+            _playerFacing.FacingDirection = OrthogonalDirection.Left;
         }
         else
         {
             rotator = new Vector3(transform.rotation.x, 0f, transform.rotation.z);
-            facing.FacingDirection = OrthogonalDirection.Right;
+            _playerFacing.FacingDirection = OrthogonalDirection.Right;
         }
 
         transform.rotation = Quaternion.Euler(rotator);
-        followObject.CallTurn();
+        _playerCameraHandler.CallTurn();
 
-        if (grounded.isGrounded)
+        if (_playerGrounded.IsGrounded)
         {
-            dustParticles.Play();
+            PlayerParticleManager.instance.PlayParticles(PlayerParticleName.TurnParticles);
+            PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnPlayerTurnGrounded, null);
         }
+
+        PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnPlayerTurn, null);
 
     }
 
@@ -212,12 +197,12 @@ public class PlayerMovement : PlayerMovementBehaviour
     {
         if (isFacingRight)
         {
-            if (facing.FacingDirection != OrthogonalDirection.Right)
+            if (_playerFacing.FacingDirection != OrthogonalDirection.Right)
                 Turn();
         }
         else
         {
-            if (facing.FacingDirection != OrthogonalDirection.Left)
+            if (_playerFacing.FacingDirection != OrthogonalDirection.Left)
                 Turn();
         }
     }

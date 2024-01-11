@@ -1,54 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovementLock : MonoBehaviour
 {
     public static PlayerMovementLock instance;
-    private bool canMove = true;
-    private int currentPriority;
+
+    public bool CanMove { get; private set; } = true;
+    private int  _currentPriority;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
-            canMove = true;
+            CanMove = true;
         }
     }
 
+    /// <summary>
+    /// Lock movement if priority is higher than current lock and set priority
+    /// </summary>
+    /// <param name="priority"></param>
     public void LockMovement(int priority = 0)
     {
-        if (priority >= currentPriority)
+        if (priority >= _currentPriority)
         {
-            currentPriority = priority;
-            canMove = false;
+            _currentPriority = priority;
+            CanMove = false;
         }
     }
 
+    /// <summary>
+    /// Unlock movement if priority is higher than current lock and reset priority
+    /// </summary>
+    /// <param name="priority"></param>
     public void UnlockMovement(int priority = 0)
     {
-        if (priority >= currentPriority)
+        if (priority >= _currentPriority)
         {
-            currentPriority = 0;
-            canMove = true;
+            _currentPriority = 0;
+            CanMove = true;
         }
-        
-    }
-
-    public bool CanMove()
-    {
-        return canMove;
-    }
-}
-
-public abstract class PlayerMovementBehaviour : MonoBehaviour
-{
-    public bool CanMove()
-    {
-        if (PlayerMovementLock.instance == null)
-            return false;
-
-        return PlayerMovementLock.instance.CanMove();
     }
 }
