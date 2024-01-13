@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class CameraFollowObject : MonoBehaviour
 {
-    private Transform _playerTransform;
+    [Header("References")]
+    public Transform _playerTransform;
 
     [Header("Flip Rotation Stats")]
     public float _flipYRotationTime = 0.5f;
 
-    private PlayerFacing _playerFacing;
+    private PlayerFacing playerFacing;
 
 
     private void Awake()
     {
-        _playerTransform = GameObject.FindGameObjectWithTag("Player").gameObject.transform;
-        _playerFacing =  _playerTransform.gameObject.GetComponent<PlayerFacing>();
+        playerFacing = _playerTransform.gameObject.GetComponent<PlayerFacing>();
     }
 
     private void Update()
@@ -30,12 +30,12 @@ public class CameraFollowObject : MonoBehaviour
 
     private float DetermineEndRotation()
     {
-        if (_playerFacing.FacingDirection == OrthogonalDirection.Right)
+        if (playerFacing.FacingDirection == OrthogonalDirection.Right)
         {
             return 0f;
         }
 
-        if (_playerFacing.FacingDirection == OrthogonalDirection.Left)
+        if (playerFacing.FacingDirection == OrthogonalDirection.Left)
         {
             return 180f;
         }
