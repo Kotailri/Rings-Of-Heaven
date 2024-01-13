@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -40,12 +41,26 @@ public class ScoreManager : MonoBehaviour
         UpdateEnemyKilledUI();
     }
 
+    private void OnEnable()
+    {
+        EventManager.StartListening(EventStrings.SCORE_ADDED, OnAddScore);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.StopListening(EventStrings.SCORE_ADDED, OnAddScore);
+    }
+
+    private void OnAddScore(Dictionary<string, object> msg)
+    {
+        AddScore((int)msg["score"]);
+    }
+
     public void AddScore(int score)
     {
         currentScore += score;
         UpdateScoreUI();
     }
-    
 
     public void ResetScore()
     {

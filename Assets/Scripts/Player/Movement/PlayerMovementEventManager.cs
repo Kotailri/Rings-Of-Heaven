@@ -57,31 +57,4 @@ public static class PlayerMovementEventManager
             Logger.PrintErr("Player Movement Event Manager triggered an event that caused an error.");
         }
     }
-
-
-    // ========== EXAMPLE ============
-    /*
-    
-    EventManager.TriggerEvent("gameOver", null);
-    EventManager.TriggerEvent("addReward", new Dictionary<string, object> {
-        { "name", "candy" },
-        { "amount", 5 }  
-    });
-
-    void OnEnable()
-    {
-        EventManager.StartListening("addCoins", OnAddCoins);
-    }
-
-    void OnDisable()
-    {
-        EventManager.StopListening("addCoins", OnAddCoins);
-    }
-
-    void OnAddCoins(Dictionary<string, object> message)
-    {
-        var amount = (int)message["amount"];
-        coins += amount;
-    }
-    */
 }
