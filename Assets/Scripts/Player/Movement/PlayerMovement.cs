@@ -11,7 +11,7 @@ public class PlayerMovement : PlayerMovementBehaviour
     [SerializeField]   private float MovementSpeed; // Target speed we want the player to reach
 
     [Header("Friction")]
-    [Range(0.1f, 10f)] public float Slipperyness; // How hard it is to change direction / stop
+    [Range(0f, 10f)] public float Slipperyness; // How hard it is to change direction / stop
     [Range(1, 10)]     public float SlipSpeedMultiplier; // How much faster player can accelerate while slipping
 
     private Rigidbody2D         _RB;
@@ -100,7 +100,7 @@ public class PlayerMovement : PlayerMovementBehaviour
         if (moveInput.x == 0.0f)
         {
             // Trying to stop
-            if (Mathf.Abs(currVelocity) > (1.0f / Slipperyness))
+            if (Mathf.Abs(currVelocity) > (1.0f / Slipperyness) && Slipperyness != 0)
             {
                 float factor = 0f;
                 if (currVelocity < 0)
@@ -129,7 +129,7 @@ public class PlayerMovement : PlayerMovementBehaviour
             // Trying to move right
             if (moveInput.x > 0.0f)
             {
-                if (currVelocity < targetSpeed)
+                if (currVelocity < targetSpeed && Slipperyness != 0)
                 {
                     float factor = currVelocity + (1.0f / Slipperyness);
                     _RB.velocity = new Vector2(factor, _RB.velocity.y);
@@ -143,7 +143,7 @@ public class PlayerMovement : PlayerMovementBehaviour
             // Trying to move left
             else if (moveInput.x < 0.0f)
             {
-                if (currVelocity > targetSpeed)
+                if (currVelocity > targetSpeed && Slipperyness != 0)
                 {
                     float factor = currVelocity - (1.0f / Slipperyness);
                     _RB.velocity = new Vector2(factor, _RB.velocity.y);

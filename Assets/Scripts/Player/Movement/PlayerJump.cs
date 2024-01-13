@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -37,6 +38,9 @@ public class PlayerJump : PlayerMovementBehaviour
     {
         _RB             = GetComponent<Rigidbody2D>();
         _playerGrounded = GetComponent<PlayerGrounded>();
+
+        PlayerMovementEventManager.StartListening(PlayerMovementEvent.OnDashEnd, 
+            (Dictionary<string, object> message) => { _isJumpCut = false; });
     }
 
     public void JumpInputAction(InputAction.CallbackContext context)
