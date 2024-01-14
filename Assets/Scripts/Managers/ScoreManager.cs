@@ -56,7 +56,7 @@ public class ScoreManager : MonoBehaviour
         AddScore((int)msg["score"]);
     }
 
-    public void AddScore(int score)
+    private void AddScore(int score)
     {
         currentScore += score;
         UpdateScoreUI();

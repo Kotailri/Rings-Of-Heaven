@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -1646413651299818070}
   - component: {fileID: 1070236224050669584}
   m_Layer: 0
-  m_Name: TestRing
+  m_Name: TestRing 3
   m_TagString: Ring
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 5
   m_Sprite: {fileID: 454926181, guid: b367026a29b3bbe429a057052bb65d03, type: 3}
-  m_Color: {r: 0, g: 1, b: 0.91119623, a: 1}
+  m_Color: {r: 1, g: 0, b: 0.795773, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

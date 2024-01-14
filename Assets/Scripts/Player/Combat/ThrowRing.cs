@@ -4,109 +4,106 @@ using UnityEngine.InputSystem;
 
 public delegate bool ThrowInputFunction();
 
-public class ThrowableRing
+public class Throwable
 {
-    private readonly string RingName;
-    public GameObject RingObject { get; set; }
-    public ThrowInputFunction throwInputFunction;
-    public GameObject RingReference { get; set; }
+    public GameObject ThrowablePrefab    { get; set; }
+    public GameObject ThrowableReference { get; set; }
 
-    public bool HoldingRing { get; set; }
-
-    public bool CheckRingThrow()
+    public bool CanThrow()
     {
-        CheckRingRecieved();
-
-        if (HoldingRing)
-        {
-            HoldingRing = false;
-            return true;
-        }
-        return false;
+        return ThrowableReference == null;
     }
 
-    private void CheckRingRecieved()
+    public Throwable(GameObject _throwable) 
     {
-        if (RingReference == null)
-        {
-            HoldingRing = true;
-        }
-    }
-
-    public ThrowableRing(string _RingName, GameObject _RingObject) 
-    {
-        RingName = _RingName;
-        RingObject = _RingObject;
-        HoldingRing = true;
+        ThrowablePrefab = _throwable;
     }
 }
 
 public class ThrowRing : MonoBehaviour
 {
-    public GameObject LeftRingObj;
-    public GameObject RightRingObj;
+    [Header("Throwables")]
+    public List<GameObject> ThrowableObjects = new();
 
-    [Space(10f)]
+    [Header("Throw Blockers")]
     public Transform ringBlockFront;
     public Transform ringBlockUp;
     public Transform ringBlockDown;
 
-    [Space(10f)]
-    public Vector2 ringBlockedSize = new(0.49f, 0.03f);
+    [Space(5f)]
+    public Vector2   ringBlockedSize = new(0.49f, 0.03f);
     public LayerMask ringBlockLayer;
 
     [Space(10f)]
     public float ringThrowCooldown;
-    private bool canThrow = true;
 
-    private PlayerFacing pf;
-    private List<ThrowableRing> ThrowableRingList;
+    private bool            _canThrow = true;
+    private PlayerFacing    _playerFacing;
+    private List<Throwable> _throwableList = new();
 
     private void Awake()
     {
-        pf = GetComponent<PlayerFacing>();
-
-        ThrowableRingList = new()
+        _playerFacing = GetComponent<PlayerFacing>();
+        foreach (GameObject obj in ThrowableObjects)
         {
-            new ThrowableRing("Left Ring", LeftRingObj),
-            new ThrowableRing("Right Ring", RightRingObj)
-        };
-    }
-
-    public void ThrowLeftRing(InputAction.CallbackContext context)
-    {
-        if (context.phase != InputActionPhase.Started)
-            return;
-
-        ThrowableRing tr = ThrowableRingList[0];
-        if (tr.CheckRingThrow())
-        {
-            Throw(tr);
+            _throwableList.Add(new Throwable(obj));
         }
     }
 
-    public void ThrowRightRing(InputAction.CallbackContext context)
+    public void SwapThrowableOrderRight(InputAction.CallbackContext context)
     {
         if (context.phase != InputActionPhase.Started)
             return;
 
-        ThrowableRing tr = ThrowableRingList[1];
-        if (tr.CheckRingThrow())
+        // Ensure all throwables are not out
+        foreach (Throwable throwable in _throwableList)
         {
-            Throw(tr);
-        }
-    }
-
-    public void ThrowBothRings(InputAction.CallbackContext context)
-    {
-        if (context.phase != InputActionPhase.Started)
-            return;
-
-        foreach (ThrowableRing throwableRing in ThrowableRingList)
-        {
-            if (throwableRing.CheckRingThrow())
+            if (!throwable.CanThrow())
             {
-                Throw(throwableRing);
+                return;
+            }
+        }
+
+        // Shift all throwables, put index 0 at the end
+        Throwable firstThrowable = _throwableList[0];
+        _throwableList.RemoveAt(0);
+        _throwableList.Add(firstThrowable);
+
+        AudioManager.instance.PlaySound("click");
+    }
+
+    public void SwapThrowableOrderLeft(InputAction.CallbackContext context)
+    {
+        if (context.phase != InputActionPhase.Started)
+            return;
+
+        // Ensure all throwables are not out
+        foreach (Throwable throwable in _throwableList)
+        {
+            if (!throwable.CanThrow())
+            {
+                return;
+            }
+        }
+
+        // Shift all throwables, end index at index 0
+        Throwable firstThrowable = _throwableList[_throwableList.Count-1];
+        _throwableList.RemoveAt(_throwableList.Count-1);
+        _throwableList.Insert(0, firstThrowable);
+
+        AudioManager.instance.PlaySound("click");
+    }
+
+    public void ThrowObject(InputAction.CallbackContext context)
+    {
+        if (context.phase != InputActionPhase.Started)
+            return;
+
+        foreach (Throwable throwable in _throwableList)
+        {
+            if (throwable.CanThrow())
+            {
+                Throw(throwable);
                 return;
             }
         }
@@ -120,12 +117,12 @@ public class ThrowRing : MonoBehaviour
         Gizmos.DrawWireCube(ringBlockDown.position, ringBlockedSize);
     }
 
-    private void Throw(ThrowableRing tr)
+    private void Throw(Throwable tr)
     {
-        if (canThrow)
+        if (_canThrow)
         {
-            canThrow = false;
-            Utility.InvokeLambda(() => { canThrow = true; }, ringThrowCooldown);
+            _canThrow = false;
+            Utility.InvokeLambda(() => { _canThrow = true; }, ringThrowCooldown);
         }
         else
         {
@@ -137,9 +134,7 @@ public class ThrowRing : MonoBehaviour
         float rangeHorizontal = 1.0f;
         float rangeVertical = 2.0f;
 
-
-
-        switch (pf.PointingDirection)
+        switch (_playerFacing.PointingDirection)
         {
             case OrthogonalDirection.Left:
                 if (Physics2D.OverlapBox(ringBlockFront.position, ringBlockedSize, 0, ringBlockLayer))
@@ -172,14 +167,14 @@ public class ThrowRing : MonoBehaviour
                 break;
         }
 
-        OrthogonalDirection savedThrowDirection = pf.PointingDirection;
+        OrthogonalDirection savedThrowDirection = _playerFacing.PointingDirection;
 
         GetComponent<Animator>().SetTrigger("attack");
 
         Utility.InvokeLambda(() =>
         {
-            tr.RingReference = Instantiate(tr.RingObject, (Vector2)transform.position + throwdir - new Vector2(0, 0.5f), Quaternion.Euler(ringAngle));
-            tr.RingReference.GetComponent<Ring>().SendRing(savedThrowDirection);
+            tr.ThrowableReference = Instantiate(tr.ThrowablePrefab, (Vector2)transform.position + throwdir - new Vector2(0, 0.5f), Quaternion.Euler(ringAngle));
+            tr.ThrowableReference.GetComponent<Ring>().SendRing(savedThrowDirection);
             AudioManager.instance.PlaySound("throw");
         }, 0.1f);
         
