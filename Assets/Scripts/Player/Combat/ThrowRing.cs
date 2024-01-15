@@ -1,11 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
+[System.Serializable]
 public class Throwable
 {
-    public GameObject ThrowablePrefab    { get; set; }
+    [SerializeField]
+    public Sprite ThrowableIcon;
+
+    [SerializeField]
+    public GameObject ThrowablePrefab;
     public GameObject ThrowableReference { get; set; }
     private bool _isConsumable = false;
 
@@ -19,6 +26,11 @@ public class Throwable
         return _isConsumable;
     }
 
+    public bool IsNull()
+    {
+        return ThrowablePrefab == null;
+    }
+
     public Throwable(GameObject _throwable, bool _isConsumable = false) 
     {
         ThrowablePrefab = _throwable;
@@ -29,7 +41,7 @@ public class Throwable
 public class ThrowRing : MonoBehaviour
 {
     [Header("Throwables")]
-    public List<GameObject> ThrowableObjects = new();
+    [SerializeField] private List<Throwable> _throwableList = new();
 
     [Header("Throw Blockers")]
     public Transform ringBlockFront;
@@ -41,66 +53,142 @@ public class ThrowRing : MonoBehaviour
     public LayerMask ringBlockLayer;
 
     [Space(10f)]
-    public float ringThrowCooldown;
+    public float RingThrowCooldown;
+    public float RingSwapCooldown;
 
-    private bool            _canThrow = true;
+    [Header("UI")]
+    [SerializeField] private List<Image> _throwableImageSlot = new();
+
+    private bool _canThrow = true;
+    private bool _canSwap  = true;
+
     private PlayerFacing    _playerFacing;
     private Animator        _playerAnimator;
-    private List<Throwable> _throwableList = new();
 
     private void Awake()
     {
         _playerFacing = GetComponent<PlayerFacing>();
         _playerAnimator = GetComponent<Animator>();
 
-        foreach (GameObject obj in ThrowableObjects)
+        SetThrowableImages();
+    }
+
+    private void SetThrowableImages()
+    {
+        if (_throwableList.Count > _throwableImageSlot.Count)
         {
-            _throwableList.Add(new Throwable(obj));
+            Logger.PrintWarn("There are more throwable objects than available image slots!");
+        }
+
+        for (int i = 0; i < _throwableImageSlot.Count; i++)
+        {
+            if (_throwableList[i].ThrowableIcon != null)
+                _throwableImageSlot[i].sprite = _throwableList[i].ThrowableIcon;
         }
     }
 
     public void SwapThrowableOrderRight(InputAction.CallbackContext context)
     {
-        if (context.phase != InputActionPhase.Started)
+        if (context.phase != InputActionPhase.Started || !_canSwap)
             return;
 
-        // Ensure all throwables are not out
+        // Ensure only 1 or less throwable is out
+        int ringsOut = 0;
         foreach (Throwable throwable in _throwableList)
         {
             if (!throwable.CanThrow())
+            {
+                ringsOut++;
+            }
+
+            if (ringsOut > 1)
             {
                 return;
             }
         }
 
-        // Shift all throwables, put index 0 at the end
-        Throwable firstThrowable = _throwableList[0];
-        _throwableList.RemoveAt(0);
-        _throwableList.Add(firstThrowable);
-
-        AudioManager.instance.PlaySound("click");
+        ShiftThrowableUI(-1);
+        Throwable temp = _throwableList[_throwableList.Count - 1];
+        for (int i = _throwableList.Count - 1; i > 0; i--)
+        {
+            _throwableList[i] = _throwableList[i - 1];
+        }
+        _throwableList[0] = temp;
     }
 
     public void SwapThrowableOrderLeft(InputAction.CallbackContext context)
     {
-        if (context.phase != InputActionPhase.Started)
+        if (context.phase != InputActionPhase.Started || !_canSwap)
             return;
 
-        // Ensure all throwables are not out
+        // Ensure only 1 or less throwable is out
+        int ringsOut = 0;
         foreach (Throwable throwable in _throwableList)
         {
             if (!throwable.CanThrow())
+            {
+                ringsOut++;
+            }
+
+            if (ringsOut > 1)
             {
                 return;
             }
         }
 
-        // Shift all throwables, end index at index 0
-        Throwable firstThrowable = _throwableList[_throwableList.Count-1];
-        _throwableList.RemoveAt(_throwableList.Count-1);
-        _throwableList.Insert(0, firstThrowable);
+        ShiftThrowableUI(1);
+        Throwable temp = _throwableList[0];
+        for (int i = 1; i < _throwableList.Count; i++)
+        {
+            _throwableList[i - 1] = _throwableList[i];
+        }
+        _throwableList[_throwableList.Count-1] = temp;
+    }
 
-        AudioManager.instance.PlaySound("click");
+    private void ShiftThrowableUI(int direction)
+    {
+        StartCoroutine(SwapRingCooldown());
+
+        List<Vector3> positionLists = new();
+        foreach (Image slot in _throwableImageSlot)
+        {
+            positionLists.Add(slot.GetComponent<RectTransform>().position);
+        }
+
+        if (direction == -1)
+        {
+            // Shift array left
+            Vector3 temp = positionLists[0];
+            for (int i = 1; i < positionLists.Count; i++)
+            {
+                positionLists[i - 1] = positionLists[i];
+            }
+            positionLists[positionLists.Count - 1] = temp;
+
+            // Move UI elements            
+            for (int i = 0; i < _throwableImageSlot.Count; i++) 
+            {
+                LeanTween.move(_throwableImageSlot[i].gameObject, positionLists[i], 0.15f).setEaseInSine().setOnComplete(() => { AudioManager.instance.PlaySound("click"); });
+            }
+        }
+
+        if (direction == 1)
+        {
+            // Shift array right
+            Vector3 temp = positionLists[positionLists.Count - 1];
+            for (int i = positionLists.Count - 1; i > 0; i--)
+            {
+                positionLists[i] = positionLists[i - 1];
+            }
+            positionLists[0] = temp;
+
+            // Move UI elements
+            for (int i = 0; i < _throwableImageSlot.Count; i++)
+            {
+                LeanTween.move(_throwableImageSlot[i].gameObject, positionLists[i], 0.15f).setEaseInSine().setOnComplete(() => { AudioManager.instance.PlaySound("click"); });
+            }
+        }
+        
     }
 
     public void ThrowObject(InputAction.CallbackContext context)
@@ -108,15 +196,11 @@ public class ThrowRing : MonoBehaviour
         if (context.phase != InputActionPhase.Started)
             return;
 
-        foreach (Throwable throwable in _throwableList)
+        for (int i = 0; i < _throwableList.Count-1; i++)
         {
-            if (throwable.CanThrow())
+            if (_throwableList[i].CanThrow() && !_throwableList[i].IsNull())
             {
-                Throw(throwable);
-                if (throwable.IsConsumable())
-                {
-                    _throwableList.Remove(throwable);
-                }
+                Throw(_throwableList[i]);
                 return;
             }
         }
@@ -133,14 +217,9 @@ public class ThrowRing : MonoBehaviour
     private void Throw(Throwable tr)
     {
         if (_canThrow)
-        {
-            _canThrow = false;
-            Utility.InvokeLambda(() => { _canThrow = true; }, ringThrowCooldown);
-        }
+            StartCoroutine(ThrowRingCooldown());
         else
-        {
             return;
-        }
 
         Vector2 throwPos = Vector2.zero;
         Vector3 ringAngle = Vector3.zero;
@@ -180,15 +259,21 @@ public class ThrowRing : MonoBehaviour
                 break;
         }
 
-        OrthogonalDirection savedThrowDirection = _playerFacing.PointingDirection;
+        StartCoroutine(ThrowRingDelay(tr, throwPos, ringAngle, _playerFacing.PointingDirection));
+    }
 
-        
-        StartCoroutine(ThrowRingDelay(tr, throwPos, ringAngle, savedThrowDirection));
+    private IEnumerator ThrowRingCooldown()
+    {
+        _canThrow = false;
+        yield return new WaitForSeconds(RingThrowCooldown);
+        _canThrow = true;
+    }
 
-        Utility.InvokeLambda(() =>
-        {
-            
-        }, 0.1f);
+    private IEnumerator SwapRingCooldown()
+    {
+        _canSwap = false;
+        yield return new WaitForSeconds(RingSwapCooldown);
+        _canSwap = true;
     }
 
     private IEnumerator ThrowRingDelay(Throwable tr, Vector2 throwPos, Vector3 ringAngle, OrthogonalDirection throwDir)

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class DefaultRing : Ring, IRingCatchable, IRingReturn
 {
-    private int ringDamage = 1;
-    private float ringSpeed = 45.0f;
+    private int   ringDamage = 1;
+    private float ringRange  = 15.0f;
+    private float ringSpeed  = 45.0f;
 
     private bool catchable = false;
     private bool returning = false;
@@ -35,19 +36,19 @@ public class DefaultRing : Ring, IRingCatchable, IRingReturn
         switch (direction)
         {
             case OrthogonalDirection.Left:
-                v = new(-range, 0);
+                v = new(-ringRange, 0);
                 break;
 
             case OrthogonalDirection.Right:
-                v = new(range, 0);
+                v = new(ringRange, 0);
                 break;
 
             case OrthogonalDirection.Up:
-                v = new(0, range);
+                v = new(0, ringRange);
                 break;
 
             case OrthogonalDirection.Down:
-                v = new(0, -range);
+                v = new(0, -ringRange);
                 break;
         }
         targetPosition = (Vector2) player.transform.position + v;
