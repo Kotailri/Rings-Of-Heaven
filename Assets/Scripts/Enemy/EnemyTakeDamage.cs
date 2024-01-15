@@ -38,7 +38,7 @@ public class EnemyTakeDamage : MonoBehaviour
 
     private void GetKnockedBack()
     {
-        Vector2 knockbackDirection = transform.position - GameObject.FindGameObjectWithTag("Player").transform.position;
+        Vector2 knockbackDirection = GameObject.FindGameObjectWithTag("Player").transform.position - transform.position;
 
         if (TryGetComponent(out StunnedByRing stun))
         {

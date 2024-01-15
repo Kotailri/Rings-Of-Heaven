@@ -27,12 +27,17 @@ public class PlayerDash : PlayerMovementBehaviour
     private bool    _isDashing     = false;
     private Vector2 _dashDirection = Vector2.zero;
 
+    private Coroutine _dashCoroutine;
+    private Coroutine _dashEffectsCoroutine;
+
     private void Awake()
     {
         _RB             = GetComponent<Rigidbody2D>();
         _playerMovement = GetComponent<PlayerMovement>();
         _playerGrounded = GetComponent<PlayerGrounded>();
         _playerFacing   = GetComponent<PlayerFacing>();
+
+        EventManager.StartListening(EventStrings.PLAYER_DASH_INTERRUPTED, OnDashInterrupt);
     }
 
     public void Dash(InputAction.CallbackContext context)
@@ -74,8 +79,8 @@ public class PlayerDash : PlayerMovementBehaviour
             PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnDashStart, null);
 
             // Dash Coroutines
-            StartCoroutine(DashCoroutine());
-            StartCoroutine(DashEffects());
+            _dashCoroutine        = StartCoroutine(DashCoroutine());
+            _dashEffectsCoroutine = StartCoroutine(DashEffects());
 
             // Set Cooldown
             CurrentDashCooldown = DashCooldown;
@@ -128,6 +133,23 @@ public class PlayerDash : PlayerMovementBehaviour
         yield return new WaitForSecondsRealtime(DashTime / 3f);
 
         Instantiate(AfterImage, transform.position, rotation);
+    }
+
+    private void OnDashInterrupt(System.Collections.Generic.Dictionary<string, object> package)
+    {
+        if (_isDashing)
+        {
+            if (_dashCoroutine != null) { StopCoroutine(_dashCoroutine); }
+            if (_dashEffectsCoroutine != null) { StopCoroutine(_dashEffectsCoroutine); }
+
+            // Unlock movement
+            PlayerMovementLock.instance.UnlockMovement();
+            _RB.velocity = Vector2.zero;
+
+            // Unlock y position
+            _RB.constraints = RigidbodyConstraints2D.FreezeRotation;
+            _isDashing = false;
+        }
     }
 
     private void Update()

@@ -4,51 +4,47 @@ using UnityEngine;
 
 public class PlayerAnimControl : MonoBehaviour
 {
-    private Animator anim;
-
-    private Rigidbody2D RB;
-    private PlayerMovement pm;
-    private PlayerGrounded grounded;
+    private Animator       _animator;
+    private Rigidbody2D    _RB;
+    private PlayerGrounded _playerGrounded;
 
     private void Awake()
     {
-        RB = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-
-        pm = GetComponent<PlayerMovement>();
-        grounded = GetComponent<PlayerGrounded>();
+        _RB             = GetComponent<Rigidbody2D>();
+        _animator       = GetComponent<Animator>();
+        _playerGrounded = GetComponent<PlayerGrounded>();
     }
 
     private void Update()
     {
-        if (grounded.IsGrounded)
+        if (_playerGrounded.IsGrounded)
         {
-            anim.SetInteger("isFlying", 0);
+            _animator.SetInteger("isFlying", 0);
 
-            if (Mathf.Abs(RB.velocity.x) > 0.5)
+            if (Mathf.Abs(_RB.velocity.x) > 0.5)
             {
-                anim.SetBool("isWalking", true);
+                _animator.SetBool("isWalking", true);
             }
             else
             {
-                anim.SetBool("isWalking", false);
+                _animator.SetBool("isWalking", false);
             }
         }   
         else
         {
-            if (RB.velocity.y > 0.5)
+            if (_RB.velocity.y > 0.5)
             {
-                anim.SetInteger("isFlying", 1);
+                _animator.SetInteger("isFlying", 1);
             }
 
-            else if (RB.velocity.y < -0.5)
+            else if (_RB.velocity.y < -0.5)
             {
-                anim.SetInteger("isFlying", -1);
+                _animator.SetInteger("isFlying", -1);
             }
 
             else
             {
-                anim.SetInteger("isFlying", 0);
+                _animator.SetInteger("isFlying", 0);
             }
         }
     }

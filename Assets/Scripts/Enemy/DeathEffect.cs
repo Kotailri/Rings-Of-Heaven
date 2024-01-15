@@ -10,11 +10,7 @@ public class DeathEffect : MonoBehaviour
     public void DoDeathEffect()
     {
         Instantiate(deathEffectObject, transform.position, Quaternion.identity);
+        Instantiate(onDeathDrop[Random.Range(0, onDeathDrop.Count)], transform.position, Quaternion.identity);
 
-        if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>().currentHealth < 10)
-        {
-            Instantiate(onDeathDrop[Random.Range(0, onDeathDrop.Count)], transform.position, Quaternion.identity);
-        }
-        
     }
 }

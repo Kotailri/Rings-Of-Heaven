@@ -1,22 +1,28 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
-public delegate bool ThrowInputFunction();
 
 public class Throwable
 {
     public GameObject ThrowablePrefab    { get; set; }
     public GameObject ThrowableReference { get; set; }
+    private bool _isConsumable = false;
 
     public bool CanThrow()
     {
         return ThrowableReference == null;
     }
 
-    public Throwable(GameObject _throwable) 
+    public bool IsConsumable()
+    {
+        return _isConsumable;
+    }
+
+    public Throwable(GameObject _throwable, bool _isConsumable = false) 
     {
         ThrowablePrefab = _throwable;
+        this._isConsumable= _isConsumable;
     }
 }
 
@@ -39,11 +45,14 @@ public class ThrowRing : MonoBehaviour
 
     private bool            _canThrow = true;
     private PlayerFacing    _playerFacing;
+    private Animator        _playerAnimator;
     private List<Throwable> _throwableList = new();
 
     private void Awake()
     {
         _playerFacing = GetComponent<PlayerFacing>();
+        _playerAnimator = GetComponent<Animator>();
+
         foreach (GameObject obj in ThrowableObjects)
         {
             _throwableList.Add(new Throwable(obj));
@@ -104,6 +113,10 @@ public class ThrowRing : MonoBehaviour
             if (throwable.CanThrow())
             {
                 Throw(throwable);
+                if (throwable.IsConsumable())
+                {
+                    _throwableList.Remove(throwable);
+                }
                 return;
             }
         }
@@ -129,7 +142,7 @@ public class ThrowRing : MonoBehaviour
             return;
         }
 
-        Vector2 throwdir = Vector2.zero;
+        Vector2 throwPos = Vector2.zero;
         Vector3 ringAngle = Vector3.zero;
         float rangeHorizontal = 1.0f;
         float rangeVertical = 2.0f;
@@ -140,14 +153,14 @@ public class ThrowRing : MonoBehaviour
                 if (Physics2D.OverlapBox(ringBlockFront.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
-                throwdir += new Vector2(-rangeHorizontal, 0);
+                throwPos += new Vector2(-rangeHorizontal, 0);
                 break;
 
             case OrthogonalDirection.Right:
                 if (Physics2D.OverlapBox(ringBlockFront.position, ringBlockedSize, 0, ringBlockLayer))
                     return;
 
-                throwdir += new Vector2(rangeHorizontal, 0);
+                throwPos += new Vector2(rangeHorizontal, 0);
                 break;
 
             case OrthogonalDirection.Up:
@@ -155,7 +168,7 @@ public class ThrowRing : MonoBehaviour
                     return;
 
                 ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, 90);
-                throwdir += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, rangeVertical);
+                throwPos += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, rangeVertical);
                 break;
 
             case OrthogonalDirection.Down:
@@ -163,20 +176,28 @@ public class ThrowRing : MonoBehaviour
                     return;
 
                 ringAngle = new Vector3(transform.rotation.x, transform.rotation.y, -90);
-                throwdir += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, -rangeVertical);
+                throwPos += new Vector2(rangeHorizontal * Mathf.Sign(transform.rotation.y) * 2, -rangeVertical);
                 break;
         }
 
         OrthogonalDirection savedThrowDirection = _playerFacing.PointingDirection;
 
-        GetComponent<Animator>().SetTrigger("attack");
+        
+        StartCoroutine(ThrowRingDelay(tr, throwPos, ringAngle, savedThrowDirection));
 
         Utility.InvokeLambda(() =>
         {
-            tr.ThrowableReference = Instantiate(tr.ThrowablePrefab, (Vector2)transform.position + throwdir - new Vector2(0, 0.5f), Quaternion.Euler(ringAngle));
-            tr.ThrowableReference.GetComponent<Ring>().SendRing(savedThrowDirection);
-            AudioManager.instance.PlaySound("throw");
+            
         }, 0.1f);
-        
+    }
+
+    private IEnumerator ThrowRingDelay(Throwable tr, Vector2 throwPos, Vector3 ringAngle, OrthogonalDirection throwDir)
+    {
+        _playerAnimator.SetTrigger("attack");
+        yield return new WaitForSeconds(_playerAnimator.GetCurrentAnimatorStateInfo(0).length * _playerAnimator.GetCurrentAnimatorStateInfo(0).speed);
+
+        tr.ThrowableReference = Instantiate(tr.ThrowablePrefab, (Vector2)transform.position + throwPos - new Vector2(0, 0.5f), Quaternion.Euler(ringAngle));
+        tr.ThrowableReference.GetComponent<Ring>().SendRing(throwDir);
+        AudioManager.instance.PlaySound("throw");
     }
 }

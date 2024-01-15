@@ -62,7 +62,6 @@ public class EnemyHealth : MonoBehaviour
             {
                 death.DoDeathEffect();
             }
-            Managers.scoreManager.OnEnemyKilled();
             transform.position = Config.poolPosition;
             currentHealth = health;
         }

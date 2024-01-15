@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class PlayerGetHit : MonoBehaviour
 {
-    private bool  _canGetHit = true;
-    [SerializeField] private float _stunDuration = 0.25f;
-    [SerializeField] private float _knockbackForce = 10.0f;
-    [SerializeField] private float _invincibilityDuration = 1.5f;
+    [SerializeField] private float _knockbackTime;
+    [SerializeField] private float _knockbackForce;
 
-    private PlayerHealth    _playerHealth;
+    private bool _canGetHit = true;
+    private float _invincibilityDuration = 1.5f;
     private PlayerKnockback _playerKnockback;
 
     public SpriteRenderer PlayerSprite;
 
     private void Awake()
     {
-        _playerHealth    = GetComponent<PlayerHealth>();
         _playerKnockback = GetComponent<PlayerKnockback>();
     }
 
@@ -27,26 +25,29 @@ public class PlayerGetHit : MonoBehaviour
 
         if (collision.gameObject.TryGetComponent(out DamagePlayerOnHit damagePlayerOnHit))
         {
+            // TODO: get damage and knockback info from the enemy 
             ApplyHit(damagePlayerOnHit.GetContactDamage(), collision.gameObject.transform.position);
         }
     }
 
-    public void ApplyHit(int damage, Vector2 hitPosition, bool withKnockback=true)
+    public void ApplyHit(int damage, Vector2 hitPosition, float force = 0, float time=0)
     {
         if (_canGetHit == false)
             return;
 
-        if (_playerHealth.currentHealth > 1)
+        if (force==0 && time==0)
         {
-            if (withKnockback)
-            {
-                _playerKnockback.DoKnockback(_knockbackForce, _stunDuration, hitPosition);
-            }
-
-            StartCoroutine(ApplyIFrames(_invincibilityDuration));
+            EventManager.TriggerEvent(EventStrings.PLAYER_KNOCKED_BACK, new Dictionary<string, object> { 
+                { "force", _knockbackForce }, { "time", _knockbackTime }, { "direction", (Vector2)transform.position - hitPosition } });
+        }
+        else
+        {
+            EventManager.TriggerEvent(EventStrings.PLAYER_KNOCKED_BACK, new Dictionary<string, object> {
+                { "force", force }, { "time", time }, { "direction", (Vector2)transform.position - hitPosition } });
         }
 
-        _playerHealth.TakeDamage(damage);
+        StartCoroutine(ApplyIFrames(_invincibilityDuration));
+        EventManager.TriggerEvent(EventStrings.PLAYER_DAMAGED, new Dictionary<string, object> { { "amount", damage } });
     }
 
     private IEnumerator ApplyIFrames(float duration)

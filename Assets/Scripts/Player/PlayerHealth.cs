@@ -1,68 +1,67 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 3; // Maximum hit points
-    public int currentHealth; // Current hit points
-    public Image[] healthImages; // Array to hold the UI Image elements representing hit points
+    [SerializeField] 
+    private int maxHealth;    // Maximum hit points
+    [SerializeField]
+    private int currentHealth;    // Current hit points
+
+    [Header("UI Images")]
+    public GameObject HealthImage;    // Array to hold the UI Image elements representing hit points
+    public GameObject NonHealthImage; // Array to hold the UI Image elements representing hit points
+
+    [Space(5.0f)]
+    public RectTransform HealthImageParent;
+
+    private void Awake()
+    {
+        EventManager.StartListening(EventStrings.PLAYER_DAMAGED, OnDamageTaken);
+        EventManager.StartListening(EventStrings.PLAYER_HEALED, OnPlayerHealed);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.StopListening(EventStrings.PLAYER_DAMAGED, OnDamageTaken);
+        EventManager.StopListening(EventStrings.PLAYER_HEALED, OnPlayerHealed);
+    }
 
     private void Start()
     {
-        SetMaxHealth(maxHealth);
-    }
-
-    // Set the player's maximum health
-    public void SetMaxHealth(int newMaxHealth)
-    {
-        maxHealth = newMaxHealth;
         UpdateHealthUI();
     }
 
-    public void ResetHp()
+    private void OnDamageTaken(Dictionary<string, object> payload)
     {
-        currentHealth = 3;
+        TakeDamage((int)payload["amount"]);
+    }
+
+    private void OnPlayerHealed(Dictionary<string, object> payload)
+    {
+        Heal((int)payload["amount"]);
+    }
+
+    private void AddMaxhealth(int _maxHealth)
+    {
+        maxHealth += _maxHealth;
+        currentHealth += _maxHealth;
         UpdateHealthUI();
     }
 
-    // Add to the player's maximum health
-    public void AddMaxhealth(int newMaxHealthAdd)
+    private void TakeDamage(int damageAmount)
     {
-        maxHealth += newMaxHealthAdd;
-        currentHealth += newMaxHealthAdd;
-        UpdateHealthUI();
-    }
-
-    // Function to reduce health (called when the player is hit)
-    public void TakeDamage(int damageAmount)
-    {
-        currentHealth -= damageAmount;
-        if (damageAmount > 0)
-        {
-            AudioManager.instance.PlaySound("damaged");
-        }
-
+        AudioManager.instance.PlaySound("damaged");
         Global.vignetteTween.SetVignetteDamage();
 
-        // Ensure health doesn't go below zero
-        if (currentHealth < 0)
-        {
-            currentHealth = 0;
-        }
-
+        currentHealth -= damageAmount;
         UpdateHealthUI();
 
         // Check if the player is dead
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) { }
     }
 
-    public void Heal(int healAmount)
+    private void Heal(int healAmount)
     {
         currentHealth += healAmount;
 
@@ -74,25 +73,43 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
-    // Function to heal the player to maximum health
-    public void HealToMaxHealth()
+    private void HealToMax()
     {
         currentHealth = maxHealth;
         UpdateHealthUI();
     }
 
-    // Update the UI to represent the current health
-    protected void UpdateHealthUI()
+    private void UpdateHealthUI()
     {
-        for (int i = 0; i < healthImages.Length; i++)
+        // check bounds
+        if (currentHealth < 0)
         {
-            // Activate or deactivate UI images based on current health
-            healthImages[i].gameObject.SetActive(i < currentHealth);
+            currentHealth = 0;
         }
-    }
 
-    public void Die()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+
+        float spacing = 3f;
+        float startingX = HealthImageParent.GetComponent<RectTransform>().position.x;
+        float startingY = HealthImageParent.GetComponent<RectTransform>().position.y;
+
+        for (int i = 0; i < maxHealth; i++)
+        {
+            if (i < currentHealth)
+            {
+                GameObject obj = Instantiate(HealthImage);
+                obj.GetComponent<RectTransform>().SetParent(HealthImageParent, false);
+                obj.GetComponent<RectTransform>().position = new Vector2(startingX + i * spacing, startingY);
+            }
+            else
+            {
+                GameObject obj = Instantiate(NonHealthImage);
+                obj.GetComponent<RectTransform>().SetParent(HealthImageParent, false);
+                obj.GetComponent<RectTransform>().position = new Vector2(startingX + i * spacing, startingY);
+            }
+        }
     }
 }

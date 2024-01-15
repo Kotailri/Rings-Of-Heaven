@@ -3,7 +3,11 @@ using System.Collections.Generic;
 
 public static class EventStrings
 {
-    public static readonly string SCORE_ADDED = "SCORE_ADDED";
+    public static readonly string PLAYER_HEALED  = "PLAYER_HEALED";
+    public static readonly string PLAYER_DAMAGED = "PLAYER_DAMAGED";
+    public static readonly string PLAYER_DEATH   = "PLAYER_DIED";
+    public static readonly string PLAYER_KNOCKED_BACK = "PLAYER_KNOCKED_BACK";
+    public static readonly string PLAYER_DASH_INTERRUPTED = "PLAYER_DASH_INTERRUPT";
 }
 
 public static class EventManager
