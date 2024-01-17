@@ -10,25 +10,22 @@ using UnityEngine.InputSystem;
 public class PlayerDash : PlayerMovementBehaviour
 {
     [SerializeField] private float DashForce;
-    [SerializeField] private float DashTime;
+    [SerializeField] private float DashDistance;
     [SerializeField] private float DashCooldown;
 
     public float CurrentDashCooldown { get; set; } = 0f;
     public bool  AirDashReady        { get; set; } = true;
-
-    [Header("Particles")]
-    public GameObject AfterImage;
 
     private Rigidbody2D    _RB;
     private PlayerMovement _playerMovement;
     private PlayerGrounded _playerGrounded;
     private PlayerFacing   _playerFacing;
 
-    private bool    _isDashing     = false;
-    private Vector2 _dashDirection = Vector2.zero;
+    private bool       _isDashing     = false;
+    private float      _dashStartXPos = 0f;
+    private Vector2    _dashDirection = Vector2.zero;
 
     private Coroutine _dashCoroutine;
-    private Coroutine _dashEffectsCoroutine;
 
     private void Awake()
     {
@@ -46,7 +43,7 @@ public class PlayerDash : PlayerMovementBehaviour
             && CurrentDashCooldown <= 0
             && CanMove()
             && _isDashing == false
-            && context.phase == InputActionPhase.Started)
+            && context.phase == InputActionPhase.Performed)
         {
             // Check Dash Requirements
             if (!_playerGrounded.IsGrounded && !AirDashReady)
@@ -75,12 +72,14 @@ public class PlayerDash : PlayerMovementBehaviour
 
             // Reset velocity
             _RB.velocity = Vector2.zero;
-
             PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnDashStart, null);
 
-            // Dash Coroutines
+            // Dash Coroutine
             _dashCoroutine        = StartCoroutine(DashCoroutine());
-            _dashEffectsCoroutine = StartCoroutine(DashEffects());
+
+            // Effects
+            AudioManager.instance.PlaySound("dash");
+            PlayerParticleManager.instance.PlayParticles(PlayerParticleName.DashParticles);
 
             // Set Cooldown
             CurrentDashCooldown = DashCooldown;
@@ -92,55 +91,29 @@ public class PlayerDash : PlayerMovementBehaviour
         // Lock Movement
         PlayerMovementLock.instance.LockMovement();
         _playerMovement.ReleaseInputs();
+        _dashStartXPos = transform.position.x;
 
         // Lock Y position
         _RB.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
         _isDashing = true;
-        
-        yield return new WaitForSecondsRealtime(DashTime);
 
-        // Unlock movement
-        PlayerMovementLock.instance.UnlockMovement();
-        _RB.velocity = Vector2.zero;
+        _RB.velocity = new Vector2(Mathf.Sign(_dashDirection.x) * DashForce, 0);
 
-        // Unlock y position
-        _RB.constraints = RigidbodyConstraints2D.FreezeRotation;
-        _isDashing = false;
+        yield return new WaitUntil(() => Mathf.Abs(transform.position.x - _dashStartXPos) >= DashDistance);
 
-        PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnDashEnd, null);
-    }
-
-    private IEnumerator DashEffects()
-    {
-        AudioManager.instance.PlaySound("dash");
-
-        // Set the after image rotation
-        Quaternion rotation = Quaternion.identity;
-        if (_playerFacing.PointingDirection == OrthogonalDirection.Left)
-        {
-            rotation = Quaternion.Euler(0, 180f, 0);
-        }
-
-        // Create after images and play particle effects
-        Instantiate(AfterImage, transform.position, rotation);
-        PlayerParticleManager.instance.PlayParticles(PlayerParticleName.DashParticles);
-
-        yield return new WaitForSecondsRealtime(DashTime / 3f);
-
-        PlayerParticleManager.instance.PlayParticles(PlayerParticleName.DashParticles);
-        Instantiate(AfterImage, transform.position, rotation);
-
-        yield return new WaitForSecondsRealtime(DashTime / 3f);
-
-        Instantiate(AfterImage, transform.position, rotation);
+        InterruptDash();
     }
 
     private void OnDashInterrupt(System.Collections.Generic.Dictionary<string, object> package)
     {
+        InterruptDash();
+    }
+
+    private void InterruptDash()
+    {
         if (_isDashing)
         {
             if (_dashCoroutine != null) { StopCoroutine(_dashCoroutine); }
-            if (_dashEffectsCoroutine != null) { StopCoroutine(_dashEffectsCoroutine); }
 
             // Unlock movement
             PlayerMovementLock.instance.UnlockMovement();
@@ -149,6 +122,9 @@ public class PlayerDash : PlayerMovementBehaviour
             // Unlock y position
             _RB.constraints = RigidbodyConstraints2D.FreezeRotation;
             _isDashing = false;
+
+            // Signal dash end
+            PlayerMovementEventManager.TriggerEvent(PlayerMovementEvent.OnDashEnd, null);
         }
     }
 
@@ -161,9 +137,14 @@ public class PlayerDash : PlayerMovementBehaviour
 
         if (_isDashing)
         {
-            _playerMovement.ReleaseInputs();
-            _RB.velocity = Vector2.zero;
-            _RB.velocity = new Vector2(Mathf.Sign(_dashDirection.x) * DashForce, 0);
+            if (_RB.velocity.x == 0 || Mathf.Abs(transform.position.x - _dashStartXPos) >= DashDistance)
+            {
+                InterruptDash();
+            }
+            else
+            {
+                _playerMovement.ReleaseInputs();
+            }
         }
 
         if (_playerGrounded.IsGrounded)
