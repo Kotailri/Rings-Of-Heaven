@@ -5,5 +5,4 @@ using UnityEngine;
 public static class Global
 {
     public static VignetteTween vignetteTween;
-    public static CanvasTimer timer;
 }
