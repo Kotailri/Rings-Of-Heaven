@@ -137,7 +137,7 @@ public class PlayerDash : PlayerMovementBehaviour
 
         if (_isDashing)
         {
-            if (_RB.velocity.x == 0 || Mathf.Abs(transform.position.x - _dashStartXPos) >= DashDistance)
+            if (Mathf.Abs(_RB.velocity.x) <= 0.1f || Mathf.Abs(transform.position.x - _dashStartXPos) >= DashDistance)
             {
                 InterruptDash();
             }
