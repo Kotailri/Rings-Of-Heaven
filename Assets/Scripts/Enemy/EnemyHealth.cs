@@ -54,6 +54,11 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
+    public bool IsDead()
+    {
+        return currentHealth <= 0;
+    }
+
     private void CheckDeath()
     {
         if (currentHealth == 0) 

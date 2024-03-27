@@ -43,6 +43,11 @@ public class EnemyTakeDamage : MonoBehaviour
             ctrl.PauseController(stunDuration);
         }
 
+        if (TryGetComponent(out EnemyFacing facing))
+        {
+            facing.PauseEnemyFacing(stunDuration);
+        }
+
         if (knockbackMultiplier > 0)
             RB.AddForce(-knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
     }
