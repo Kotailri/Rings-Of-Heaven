@@ -20,20 +20,17 @@ public class EnemyTakeDamage : MonoBehaviour
         ringIds = new();
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    public void GetHit(Ring hitby)
     {
-        if (collision.TryGetComponent(out Ring ring))
-        {
-            if (CanTakeDamage == false) { return; }
+        if (CanTakeDamage == false) { return; }
 
-            // Try to add new ring damage instance 
-            if (CheckIfCanDamage(ring.gameObject))
-            {
-                ApplyDamage(ring);
-                GetKnockedBack();
-                GetComponent<Animator>().SetTrigger("hit");
-                damageParticles.Play();
-            }
+        // Try to add new ring damage instance 
+        if (CheckIfCanDamage(hitby.gameObject))
+        {
+            ApplyDamage(hitby);
+            GetKnockedBack();
+            //GetComponent<Animator>().SetTrigger("hit");
+            damageParticles.Play();
         }
     }
 
@@ -47,7 +44,7 @@ public class EnemyTakeDamage : MonoBehaviour
         }
 
         if (knockbackMultiplier > 0)
-            RB.AddForce(knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
+            RB.AddForce(-knockbackDirection.normalized * (Config.RingKnockbackForce * knockbackMultiplier), ForceMode2D.Impulse);
     }
 
     private bool CheckIfCanDamage(GameObject ring)

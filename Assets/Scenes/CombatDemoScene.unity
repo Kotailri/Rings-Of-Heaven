@@ -285,7 +285,7 @@ GameObject:
   - component: {fileID: 308850744}
   m_Layer: 10
   m_Name: PlayerHitbox
-  m_TagString: Player
+  m_TagString: PlayerHitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1564,6 +1564,8 @@ GameObject:
   - component: {fileID: 929883189}
   - component: {fileID: 929883190}
   - component: {fileID: 929883191}
+  - component: {fileID: 929883193}
+  - component: {fileID: 929883192}
   m_Layer: 7
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -1591,7 +1593,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 647d506ab3f586b4790b99c498367e4c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1609,10 +1611,10 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -2093775695
+  m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5f7fa9a7940a64e79b5a42d9f661d42c, type: 3}
+  m_Sprite: {fileID: -1858125449, guid: 8fed520af55a09646a208c0453c57260, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1655,18 +1657,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.025607258, y: -0.01646185}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.56, y: 2.56}
+    oldSize: {x: 0.9714286, y: 1}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 2.5}
+  m_Size: {x: 0.7171504, y: 0.91966784}
   m_EdgeRadius: 0
 --- !u!50 &929883186
 Rigidbody2D:
@@ -1750,7 +1752,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c47a8344949654ea2049f0e3af757c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
+  health: 3
+--- !u!114 &929883192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929883183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cbfb50192bfbb241aafbec2df0ffc60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageParticles: {fileID: 369915818356878562, guid: f626df32ad56a9c439bb654c678ab011, type: 3}
+  CanTakeDamage: 1
+  stunDuration: 0.5
+  knockbackMultiplier: 0.5
+--- !u!114 &929883193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929883183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df78bca66fec05a4db62b05a2f18e82d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _flashColour: {r: 1, g: 1, b: 1, a: 1}
+  _flashTime: 0.1
 --- !u!1 &953170384
 GameObject:
   m_ObjectHideFlags: 0
@@ -3352,8 +3384,8 @@ Transform:
   m_GameObject: {fileID: 1673539196}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
-  m_LocalScale: {x: 1.2, y: 2.4, z: 1}
+  m_LocalPosition: {x: 0.0256, y: -0.0165, z: -10}
+  m_LocalScale: {x: 0.651314, y: 0.93486804, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 929883187}

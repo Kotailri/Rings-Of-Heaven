@@ -61,12 +61,12 @@ public class PlayerDash : PlayerMovementBehaviour
 
             // Set the dash direction
             
-            if (_playerFacing.PointingDirection == OrthogonalDirection.Left)
+            if (_playerFacing.FacingDirection == OrthogonalDirection.Left)
             {
                 _dashDirection = Vector2.left;
             }
 
-            if (_playerFacing.PointingDirection == OrthogonalDirection.Right)
+            if (_playerFacing.FacingDirection == OrthogonalDirection.Right)
             {
                 _dashDirection = Vector2.right;
             }

@@ -42,12 +42,12 @@ public class EnemyHitbox : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ring"))
         {
-
+            transform.parent.gameObject.GetComponent<EnemyTakeDamage>().GetHit(collision.gameObject.GetComponent<Ring>());
         }
 
         if (_hitboxActive)
         {
-            if (collision.gameObject.CompareTag("Player"))
+            if (collision.gameObject.CompareTag("PlayerHitbox"))
             {
                 EventManager.TriggerEvent(EventStrings.PLAYER_HIT, new Dictionary<string, object> {
                     { "hitPositionX", transform.position.x },
