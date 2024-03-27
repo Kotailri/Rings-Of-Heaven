@@ -30,7 +30,7 @@ public class PlayerKnockback : MonoBehaviour
     /// <param name="direction"></param>
     private void OnPlayerKnockback(Dictionary<string, object> payload)
     {
-        DoKnockback((float)payload["force"], (float)payload["time"], (Vector2)payload["direction"]);
+        DoKnockback((float)payload["force"], (float)payload["time"], new Vector2((float)payload["hitPositionX"], (float)payload["hitPositionY"]));
     }
 
     private void Update()
@@ -48,13 +48,25 @@ public class PlayerKnockback : MonoBehaviour
     /// <param name="knockbackForce"></param>
     /// <param name="knockbackTime"></param>
     /// <param name="knockbackDirection"></param>
-    private void DoKnockback(float knockbackForce, float knockbackTime, Vector2 knockbackDirection)
+    private void DoKnockback(float knockbackForce, float knockbackTime, Vector2 hitPosition)
     {
         EventManager.TriggerEvent(EventStrings.PLAYER_DASH_INTERRUPTED, null);
 
         _knoockbackTime = knockbackTime;
         _knockbackForce = knockbackForce;
-        _knockbackDirection = knockbackDirection;
+
+        // determine knockback direction
+        float knockbackDirX = 1;
+        if (hitPosition.x > transform.position.x)
+            knockbackDirX = -1;
+
+        float knockbackDirY = 0;
+        if (transform.position.y > hitPosition.y)
+        {
+            knockbackDirY = 1;
+        }
+
+        _knockbackDirection = new(knockbackDirX, knockbackDirY);
 
         _RB.velocity = Vector2.zero;
         _currentKnockbackTime = 0;
@@ -64,8 +76,11 @@ public class PlayerKnockback : MonoBehaviour
 
     private IEnumerator LockMovementTimer()
     {
+        _RB.gravityScale = 0f;
         PlayerMovementLock.instance.LockMovement();
         yield return new WaitForSeconds(_knoockbackTime);
         PlayerMovementLock.instance.UnlockMovement();
+        _RB.gravityScale = 1f;
+        _RB.velocity = Vector2.zero;
     }
 }

@@ -2,14 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StartDirection
-{
-    Left,
-    Right,
-    Random
-}
+public enum StartDirection { Left, Right, Random }
 
-public class EnemyPatrol : MonoBehaviour, StunnedByRing
+public class PatrolIdleState : MonoBehaviour, IEnemyIdleState
 {
     public StartDirection startDirection;
     public float patrolSpeed;
@@ -48,7 +43,7 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
         RB = GetComponent<Rigidbody2D>();
     }
 
-    private void Start()
+    public void OnStateEnter()
     {
         if (startDirection == StartDirection.Random)
         {
@@ -81,7 +76,7 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
         }
     }
 
-    private void Update()
+    public void OnStateUpdate()
     {
         if (canMove == false)
         {
@@ -126,6 +121,19 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
         }
     }
 
+    public void OnStateExit() { }
+
+    public void OnStateResumed()
+    {
+        canMove = true;
+        SetDirection(currentDirection);
+    }
+
+    public void OnStatePaused()
+    {
+        canMove = false;
+    }
+
     private bool CheckGrounded()
     {
         return Physics2D.OverlapBox(groundDetect.position, groundDetectSize, 0, groundDetectLayer);
@@ -143,34 +151,5 @@ public class EnemyPatrol : MonoBehaviour, StunnedByRing
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(groundDetect.position, groundDetectSize);
-    }
-
-    public void GetStunned()
-    {
-
-        if (canMove)
-        {
-            canMove = false;
-            RB.velocity = Vector2.zero;
-            Utility.InvokeLambda(() =>
-            {
-                RecoverMovement();
-            }, 0.1f);
-        }
-        
-    }
-
-    private void RecoverMovement()
-    {
-        if (RB == null)
-            return;
-
-        if (!canMove)
-        {
-            RB.velocity = Vector2.zero;
-            canMove = true;
-            SetDirection(currentDirection);
-        }
-        
     }
 }

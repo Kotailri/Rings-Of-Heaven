@@ -35,6 +35,7 @@ public class PlayerDash : PlayerMovementBehaviour
         _playerFacing   = GetComponent<PlayerFacing>();
 
         EventManager.StartListening(EventStrings.PLAYER_DASH_INTERRUPTED, OnDashInterrupt);
+        EventManager.StartListening(EventStrings.PLAYER_DASH_RESET, OnDashReset);
     }
 
     public void Dash(InputAction.CallbackContext context)
@@ -107,6 +108,11 @@ public class PlayerDash : PlayerMovementBehaviour
     private void OnDashInterrupt(System.Collections.Generic.Dictionary<string, object> package)
     {
         InterruptDash();
+    }
+
+    private void OnDashReset(System.Collections.Generic.Dictionary<string, object> package)
+    {
+        AirDashReady = true;
     }
 
     private void InterruptDash()

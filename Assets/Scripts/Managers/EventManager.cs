@@ -5,9 +5,12 @@ public static class EventStrings
 {
     public static readonly string PLAYER_HEALED  = "PLAYER_HEALED";
     public static readonly string PLAYER_DAMAGED = "PLAYER_DAMAGED";
+    public static readonly string PLAYER_HIT     = "PLAYER_HIT";
     public static readonly string PLAYER_DEATH   = "PLAYER_DIED";
-    public static readonly string PLAYER_KNOCKED_BACK = "PLAYER_KNOCKED_BACK";
+
+    public static readonly string PLAYER_KNOCKED_BACK     = "PLAYER_KNOCKED_BACK";
     public static readonly string PLAYER_DASH_INTERRUPTED = "PLAYER_DASH_INTERRUPT";
+    public static readonly string PLAYER_DASH_RESET       = "PLAYER_DASH_RESET";
 }
 
 public static class EventManager

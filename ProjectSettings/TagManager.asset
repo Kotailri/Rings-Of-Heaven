@@ -21,8 +21,8 @@ TagManager:
   - Ice
   - Enemy
   - Player
-  - 
-  - 
+  - EnemyHitbox
+  - PlayerHitbox
   - 
   - 
   - 

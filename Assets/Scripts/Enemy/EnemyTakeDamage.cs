@@ -7,6 +7,7 @@ public class EnemyTakeDamage : MonoBehaviour
 {
     public ParticleSystem damageParticles;
     public bool CanTakeDamage = true;
+    public float stunDuration;
     public float knockbackMultiplier;
 
     private Rigidbody2D RB;
@@ -40,13 +41,9 @@ public class EnemyTakeDamage : MonoBehaviour
     {
         Vector2 knockbackDirection = GameObject.FindGameObjectWithTag("Player").transform.position - transform.position;
 
-        if (TryGetComponent(out StunnedByRing stun))
+        if (TryGetComponent(out IEnemyController ctrl))
         {
-            stun.GetStunned();
-        }
-        else
-        {
-            RB.velocity = Vector2.zero;
+            ctrl.PauseController(stunDuration);
         }
 
         if (knockbackMultiplier > 0)

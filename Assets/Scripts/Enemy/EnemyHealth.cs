@@ -58,7 +58,7 @@ public class EnemyHealth : MonoBehaviour
     {
         if (currentHealth == 0) 
         {
-            if (TryGetComponent(out DeathEffect death))
+            if (TryGetComponent(out IDeathEffect death))
             {
                 death.DoDeathEffect();
             }
