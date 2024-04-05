@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7729561666151780062}
   - component: {fileID: -1646413651299818070}
   - component: {fileID: 1070236224050669584}
+  - component: {fileID: 5763649657327437519}
   m_Layer: 0
   m_Name: TestRing 1
   m_TagString: Ring
@@ -193,3 +194,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5763649657327437519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5988375846544332659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d50fe3d60411d114ea27f41cef42d31c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tags: 01000000

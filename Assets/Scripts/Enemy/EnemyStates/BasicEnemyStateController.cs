@@ -62,6 +62,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
         }
 
         _playerLayerMask = LayerMask.GetMask("Player");
+        health = GetComponent<EnemyHealth>();
     }
 
     public void PauseController(float time)
@@ -120,7 +121,6 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
     {
         // Check Attack State
         if (HasAttackState && 
-            _currentState != EnemyState.Attack &&
             Physics2D.OverlapBox(transform.position, AttackState.GetAttackDetectionArea(), _playerLayerMask))
         {
             return EnemyState.Attack;
@@ -128,8 +128,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
 
         // Check Chase State
         if (HasChaseState && 
-            _currentState != EnemyState.Chase &&
-            Physics2D.OverlapBox(transform.position, _detectionArea, _playerLayerMask))
+            Physics2D.OverlapBox(transform.position, _detectionArea, 0, _playerLayerMask))
         {
             return EnemyState.Chase;
         }
@@ -157,6 +156,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
             CurrentState = newState;
 
             GetEnemyStateFromEnum(CurrentState).OnStateEnter();
+            print(newState.ToString());
         }
         
     }

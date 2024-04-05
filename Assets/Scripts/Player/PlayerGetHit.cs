@@ -7,16 +7,7 @@ public class PlayerGetHit : MonoBehaviour
     [SerializeField] private float _knockbackTime;
     [SerializeField] private float _knockbackForce;
 
-    private bool _canGetHit = true;
-    private float _invincibilityDuration = 1.5f;
-    private PlayerKnockback _playerKnockback;
-
     public SpriteRenderer PlayerSprite;
-
-    private void Awake()
-    {
-        _playerKnockback = GetComponent<PlayerKnockback>();
-    }
 
     private void OnEnable()
     {

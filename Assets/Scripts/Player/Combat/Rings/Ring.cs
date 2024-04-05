@@ -10,12 +10,9 @@ public abstract class Ring : MonoBehaviour
 
     protected void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.TryGetComponent(out TagManager tagManager))
+        if (Utility.IsOfTag(collision.gameObject, Tags.BrokeByRing))
         {
-            if (tagManager.IsOfTag(Tags.BrokeByRing))
-            {
-                Destroy(collision.gameObject);
-            }
+            Destroy(collision.gameObject);
         }
     }
 }

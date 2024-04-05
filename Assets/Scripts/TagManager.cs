@@ -4,6 +4,7 @@ using UnityEngine;
 public enum Tags
 {
     DamagesPlayer,
+    DamagesEnemy,
     DamagedByPlayer,
     BouncesRing,
     BrokeByRing

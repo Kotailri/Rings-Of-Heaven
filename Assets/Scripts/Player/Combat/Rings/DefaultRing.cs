@@ -74,13 +74,10 @@ public class DefaultRing : Ring, IRingCatchable, IRingReturn
     {
         base.OnTriggerStay2D(collision);
 
-        if (!IsReturning() && collision.gameObject.TryGetComponent(out TagManager tagManager))
+        if (!IsReturning() && Utility.IsOfTag(collision.gameObject, Tags.BouncesRing)) 
         {
-            if (tagManager.IsOfTag(Tags.BouncesRing))
-            {
-                catchable = true;
-                Return();
-            }
+            catchable = true;
+            Return();
         }
 
         if (IsReturning() && collision.gameObject.CompareTag("Player"))

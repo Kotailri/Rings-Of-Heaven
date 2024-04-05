@@ -40,7 +40,7 @@ public class EnemyHitbox : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Ring"))
+        if (Utility.IsOfTag(collision.gameObject, Tags.DamagesEnemy))
         {
             transform.parent.gameObject.GetComponent<EnemyTakeDamage>().GetHit(collision.gameObject.GetComponent<Ring>());
         }
