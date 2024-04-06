@@ -12,7 +12,7 @@ public enum Tags
 
 public class TagManager : MonoBehaviour
 {
-    public List<Tags> tags = new List<Tags>();
+    public List<Tags> tags = new();
     
     public bool IsOfTag(Tags tag)
     {

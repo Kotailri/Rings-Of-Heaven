@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public int health;
+    private int health;
     private int currentHealth;
 
     private void Awake()
     {
         currentHealth = health;        
+    }
+
+    public void SetHealth(int _health)
+    {
+        health = _health;
+        currentHealth = health;
     }
 
     public int GetMaxHealth()

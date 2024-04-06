@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public enum EnemyFacingMode
@@ -19,6 +18,10 @@ public class EnemyFacing : MonoBehaviour
 {
     public LeftRightFacing DefaultFacingDirection;
     public EnemyFacingMode _EnemyFacingMode;
+
+    [Space(10f)]
+    public bool FlipsObject;
+    public bool _isFlipped = false;
 
     private SpriteRenderer _spriteRenderer;
     private GameObject _playerObject;
@@ -45,6 +48,24 @@ public class EnemyFacing : MonoBehaviour
         CanChangeFacingDirection = true;
     }
 
+    private void FlipX(bool flip)
+    {
+        if (flip == _isFlipped) { return; }
+
+        _isFlipped = flip;
+
+        if (FlipsObject)
+        {
+            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+
+        }
+        else
+        {
+            _spriteRenderer.flipX = flip;
+        }
+        
+    }
+
     private void Update()
     {
         if (!CanChangeFacingDirection)
@@ -57,11 +78,11 @@ public class EnemyFacing : MonoBehaviour
             {
                 if (DefaultFacingDirection == LeftRightFacing.Left)
                 {
-                    _spriteRenderer.flipX = true;
+                    FlipX(true);
                 }
                 else
                 {
-                    _spriteRenderer.flipX = false;
+                    FlipX(false);
                 }
             }
             // should face left
@@ -69,11 +90,11 @@ public class EnemyFacing : MonoBehaviour
             {
                 if (DefaultFacingDirection == LeftRightFacing.Right)
                 {
-                    _spriteRenderer.flipX = true;
+                    FlipX(true);
                 }
                 else
                 {
-                    _spriteRenderer.flipX = false;
+                    FlipX(false);
                 }
             }
         }
@@ -85,11 +106,11 @@ public class EnemyFacing : MonoBehaviour
             {
                 if (DefaultFacingDirection == LeftRightFacing.Left)
                 {
-                    _spriteRenderer.flipX = true;
+                    FlipX(true);
                 }
                 else
                 {
-                    _spriteRenderer.flipX = false;
+                    FlipX(false);
                 }
             }
             // moving left
@@ -97,11 +118,11 @@ public class EnemyFacing : MonoBehaviour
             {
                 if (DefaultFacingDirection == LeftRightFacing.Right)
                 {
-                    _spriteRenderer.flipX = true;
+                    FlipX(true);
                 }
                 else
                 {
-                    _spriteRenderer.flipX = false;
+                    FlipX(false);
                 }
             }
         }

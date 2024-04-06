@@ -96,14 +96,16 @@ public class PatrolIdleState : MonoBehaviour, IEnemyIdleState
             }
         }
 
-        // Ledge detected on left side
-        if (!Physics2D.OverlapBox(ledgeDetectLeft.position, ledgeDetectSize, 0, ledgeDetectLayer))
+        // Ledge detected on left side and not right
+        if (!Physics2D.OverlapBox(ledgeDetectLeft.position, ledgeDetectSize, 0, ledgeDetectLayer)
+            && Physics2D.OverlapBox(ledgeDetectRight.position, ledgeDetectSize, 0, ledgeDetectLayer))
         {
             SetDirection(StartDirection.Right);
         }
 
-        // Ledge detected on right side
-        if (!Physics2D.OverlapBox(ledgeDetectRight.position, ledgeDetectSize, 0, ledgeDetectLayer))
+        // Ledge detected on right side and not left
+        if (!Physics2D.OverlapBox(ledgeDetectRight.position, ledgeDetectSize, 0, ledgeDetectLayer)
+            && Physics2D.OverlapBox(ledgeDetectLeft.position, ledgeDetectSize, 0, ledgeDetectLayer))
         {
             SetDirection(StartDirection.Left);
         }

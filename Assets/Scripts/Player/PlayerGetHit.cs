@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class PlayerGetHit : MonoBehaviour
 {
@@ -19,6 +20,10 @@ public class PlayerGetHit : MonoBehaviour
         EventManager.StopListening(EventStrings.PLAYER_HIT, OnPlayerHit);
     }
 
+    /// <summary>
+    /// Example usage: {{ "hitPositionX", transform.position.x},{ "hitPositionY", transform.position.y },{ "hitDamage", hitDamage }}
+    /// </summary>
+    /// <param name="payload"></param>
     private void OnPlayerHit(Dictionary<string, object> payload)
     {
         ApplyHit((int)payload["hitDamage"], new Vector2((float)payload["hitPositionX"], (float)payload["hitPositionY"]));

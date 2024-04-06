@@ -9,6 +9,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
 {
     [SerializeField] private Vector2 _detectionArea;
     [SerializeField] private EnemyHitbox _hitbox;
+    [SerializeField] private int _enemyHealth;
     [SerializeField] private int _contactDamage;
     private EnemyState CurrentState = EnemyState.Idle;
 
@@ -25,6 +26,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
 
     private void Awake()
     {
+        
         _hitbox.SetHitboxDamage(_contactDamage);
 
         if (TryGetComponent(out IEnemyIdleState idleState))
@@ -62,7 +64,9 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
         }
 
         _playerLayerMask = LayerMask.GetMask("Player");
+
         health = GetComponent<EnemyHealth>();
+        health.SetHealth(_enemyHealth);
     }
 
     public void PauseController(float time)
