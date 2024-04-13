@@ -9,6 +9,7 @@ public class PlayerGetHit : MonoBehaviour
     [SerializeField] private float _knockbackForce;
 
     public SpriteRenderer PlayerSprite;
+    private bool _canBeHit = true;
 
     private void OnEnable()
     {
@@ -26,7 +27,10 @@ public class PlayerGetHit : MonoBehaviour
     /// <param name="payload"></param>
     private void OnPlayerHit(Dictionary<string, object> payload)
     {
-        ApplyHit((int)payload["hitDamage"], new Vector2((float)payload["hitPositionX"], (float)payload["hitPositionY"]));
+        if (_canBeHit)
+        {
+            ApplyHit((int)payload["hitDamage"], new Vector2((float)payload["hitPositionX"], (float)payload["hitPositionY"]));
+        }
     }
 
     public void ApplyHit(int damage, Vector2 hitPosition, float force = 0, float time=0)
@@ -47,7 +51,11 @@ public class PlayerGetHit : MonoBehaviour
     private IEnumerator ApplyIFrames(float duration)
     {
         PlayerSprite.color = new Color(1, 0, 0, 0.5f);
+        _canBeHit = false;
+
         yield return new WaitForSeconds(duration);
+
         PlayerSprite.color = new Color(1, 1, 1, 1);
+        _canBeHit = true;
     }
 }

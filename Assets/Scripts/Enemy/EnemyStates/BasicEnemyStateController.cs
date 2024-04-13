@@ -125,7 +125,7 @@ public class BasicEnemyStateController : MonoBehaviour, IEnemyController
     {
         // Check Attack State
         if (HasAttackState && 
-            Physics2D.OverlapBox(transform.position, AttackState.GetAttackDetectionArea(), _playerLayerMask))
+            Physics2D.OverlapBox(transform.position, AttackState.GetAttackDetectionArea(), 0, _playerLayerMask))
         {
             return EnemyState.Attack;
         }

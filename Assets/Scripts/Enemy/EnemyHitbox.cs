@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHitbox : MonoBehaviour
+public class EnemyHitbox : IFrameHitbox
 {
-    private bool _hitboxActive = true;
     [SerializeField] private int _hitboxDamage = 0;
 
     public void SetHitboxDamage(int damage)
@@ -12,37 +11,22 @@ public class EnemyHitbox : MonoBehaviour
         _hitboxDamage = damage;
     }
 
-    private void OnEnable()
+    private void Awake()
     {
         if (!Config.HitboxDebugMode)
         {
             GetComponent<SpriteRenderer>().enabled = false;
         }
-        EventManager.StartListening(EventStrings.PLAYER_HIT, OnPlayerHit);
-    }
-
-    private void OnDisable()
-    {
-        EventManager.StopListening(EventStrings.PLAYER_HIT, OnPlayerHit);
-    }
-
-    private void OnPlayerHit(Dictionary<string, object> payload)
-    {
-        StartCoroutine(DisableHitboxTime());
-    }
-
-    private IEnumerator DisableHitboxTime()
-    {
-        _hitboxActive = false;
-        yield return new WaitForSeconds(Config.PlayerIFrameTime);
-        _hitboxActive = true;
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (Utility.IsOfTag(collision.gameObject, Tags.DamagesEnemy))
         {
-            transform.parent.gameObject.GetComponent<EnemyTakeDamage>().GetHit(collision.gameObject.GetComponent<Ring>());
+            if (transform.parent.gameObject.TryGetComponent(out EnemyTakeDamage etd))
+            {
+                etd.GetHit(collision.gameObject.GetComponent<Ring>());
+            }
         }
 
         if (_hitboxActive)
