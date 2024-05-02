@@ -24,10 +24,8 @@ public abstract class IFrameHitbox : MonoBehaviour
 
     private IEnumerator DisableHitboxTime()
     {
-        print(gameObject.name + " hitbox Disabled");
         _hitboxActive = false;
         yield return new WaitForSeconds(Config.PlayerIFrameTime);
-        print(gameObject.name + " hitbox Enabled");
         _hitboxActive = true;
     }
 }

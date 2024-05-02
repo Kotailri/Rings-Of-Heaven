@@ -2,13 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Direction
+{
+    Left, Right, Top, Bottom
+}
+
+[System.Serializable]
+public class WallEnemy
+{
+    public GameObject enemy;
+    public List<Direction> spawnableWalls;
+}
+
 public class EnemyWaveSpawner : MonoBehaviour
 {
-    private enum Direction
-    {
-        Left, Right, Top, Bottom
-    }
-
     public Transform TopWall;
     public Transform BotWall;
 
@@ -20,7 +27,7 @@ public class EnemyWaveSpawner : MonoBehaviour
 
     [Space(5f)]
     public List<GameObject> Enemies = new();
-    public List<GameObject> WallEnemies = new();
+    public List<WallEnemy> WallEnemies = new();
 
     private (float low, float high) _verticalRange;
     private (float low, float high) _horizontalRange;
@@ -38,35 +45,38 @@ public class EnemyWaveSpawner : MonoBehaviour
     {
         Quaternion _rotation = Quaternion.identity;
         Vector2 _position = Vector2.zero;
-        GameObject _enemy = WallEnemies[Random.Range(0, WallEnemies.Count)];
+        WallEnemy walLEnemy = WallEnemies[Random.Range(0, WallEnemies.Count)];
+
+        GameObject _enemy = walLEnemy.enemy;
+        Direction chosenDirection = walLEnemy.spawnableWalls[Random.Range(0, walLEnemy.spawnableWalls.Count)];
         SpriteRenderer _enemyBounds = _enemy.GetComponent<SpriteRenderer>();
 
-        switch (Random.Range(0,4))
+        switch (chosenDirection)
         {
-            case 0: // Left
+            case Direction.Left: // Left
                 _rotation = Quaternion.Euler(0, 0, -90);
-                _position = FindEmptyWallLocation(_enemyBounds, Direction.Left);
                 break;
 
-            case 1: // Right
+            case Direction.Right: // Right
                 _rotation = Quaternion.Euler(0, 0, 90);
-                _position = FindEmptyWallLocation(_enemyBounds, Direction.Right);
                 break;
 
-            case 2: // Top
+            case Direction.Top: // Top
                 _rotation = Quaternion.Euler(0, 0, 180);
-                _position = FindEmptyWallLocation(_enemyBounds, Direction.Top);
                 break;
 
-            case 3: // Bot
+            case Direction.Bottom: // Bot
                 _rotation = Quaternion.identity;
-                _position = FindEmptyWallLocation(_enemyBounds, Direction.Bottom);
                 break;
         }
 
-        if (_position != Vector2.zero)
-            Instantiate(_enemy, _position, _rotation);
+        _position = FindEmptyWallLocation( _enemyBounds, chosenDirection);
 
+        if (_position != Vector2.zero)
+        {
+            Instantiate(_enemy, _position, _rotation);
+        }
+        
     }
 
     private Vector2 FindEmptyWallLocation(SpriteRenderer enemyBounds, Direction dir)
@@ -97,8 +107,7 @@ public class EnemyWaveSpawner : MonoBehaviour
             }
 
             // check position available
-            if (!Physics2D.OverlapBox(_position, new Vector2(enemyBounds.bounds.size.x * 2, 
-                                                             enemyBounds.bounds.size.y * 2), 0, AvoidLayer))
+            if (!Physics2D.OverlapBox(_position, new Vector2(enemyBounds.bounds.size.x, enemyBounds.bounds.size.y), 0, AvoidLayer))
             {
                 return _position;
             }
